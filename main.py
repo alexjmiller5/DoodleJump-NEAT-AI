@@ -24,6 +24,11 @@ from pygame.locals import (
 WIDTH = 400 # Screen width constant
 HEIGHT = int(WIDTH*1.5) # Screen height constant
 
+# initialize the framerate object and clock so that we can standardize framerate
+clock = pg.time.Clock()
+FRAME_RATE = 120
+DT = (1/FRAME_RATE)*1200
+
 # Set up the drawing window
 screen = pg.display.set_mode([WIDTH, HEIGHT])
 pg.display.set_caption("Doodle Jump!")
@@ -38,12 +43,16 @@ platforms = []
 platforms.append(plat.Platform((WIDTH//4,int(HEIGHT*0.8))))
 
 # set gravity strength
-gravity = (0, -1)
+gravity = 0.000012
 
+score = 0
 
 # Run until the user asks to quit
 running = True
 while running:
+
+    # dt = change in time; this will standardize speeds based on framerate
+    clock.tick(FRAME_RATE)
 
     # Event handling
     for event in pg.event.get():
@@ -58,12 +67,22 @@ while running:
     for x_pos in vertical_lines:
         pg.draw.line(screen, (233, 225, 214), (x_pos, 0), (x_pos, HEIGHT))
 
-    player.pos = tuple(sum(x) for x in zip(player.pos, gravity))
+    for platform in platforms:
+        # if the player collides with a platform, it should bounce upwards
+        if platform.collided_width(player):
+            print("The player collided with a platform")
+            player.vel = (player.vel[0], -.1*DT)
+            player.acc = (player.acc[0], 0)
+            player.pos = player.prev_pos
 
+    # make the player be affected by gravity
+    player.acc = (player.acc[0], player.acc[1] + gravity*DT)
+
+    player.move(DT)
+
+    # display all objects
     for platform in platforms:
         platform.display(screen)
-        if player.pos[0] > platform.pos[0] - platform.
-
     player.display(screen)
 
     pg.display.flip() # update the screen

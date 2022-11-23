@@ -9,8 +9,8 @@ class Doodler:
     def __init__(self, WIDTH, HEIGHT):
         self.img = pg.image.load("doodler.png").convert()
         self.rect = self.img.get_rect()
-        self.prev_pos = (WIDTH / 2, HEIGHT - 100)
-        self.pos = (WIDTH / 2, HEIGHT - 100)
+        self.prev_pos = (WIDTH / 2, HEIGHT - 300)
+        self.pos = (WIDTH / 2, HEIGHT - 300)
         self.vel = (0, 0)
         self.acc = (0, 0)
         self.score = 0
@@ -18,7 +18,7 @@ class Doodler:
     def display(self, surf):
         surf.blit(self.img, self.pos)
 
-    def move(self):
+    def move(self, dt):
         self.prev_pos = self.pos
-        self.pos = tuple(sum(x) for x in zip(self.pos, self.vel))
-        self.vel = tuple(sum(x) for x in zip(self.vel, self.acc))
+        self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
+        self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)

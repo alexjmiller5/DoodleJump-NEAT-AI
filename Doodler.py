@@ -4,10 +4,12 @@
 # File description (Doodler.py): creates a 
 # class for the player of the game
 import pygame as pg
+from pygame.locals import RLEACCEL
 
 class Doodler:
     def __init__(self, WIDTH, HEIGHT):
         self.img = pg.image.load("doodler.png").convert()
+        self.img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
         self.rect = self.img.get_rect()
         self.prev_pos = (WIDTH / 2, HEIGHT - 300)
         self.pos = (WIDTH / 2, HEIGHT - 300)

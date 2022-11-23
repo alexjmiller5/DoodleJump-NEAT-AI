@@ -5,14 +5,13 @@
 # functionality of the DoodleJump game using pygame
 
 import pygame as pg
-import random
-
-
+from pygame.locals import RLEACCEL
 
 class Platform():
     def __init__(self, pos):
         self.pos = pos
         self.img = pg.image.load("platform.png").convert()
+        self.img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
         # self.img = pg.Surface((20, 10))
         self.height = self.img.get_height()
         self.width = self.img.get_width()

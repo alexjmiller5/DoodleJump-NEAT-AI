@@ -21,13 +21,13 @@ from pygame.locals import (
     QUIT,
 )
 
-WIDTH = 400 # Screen width constant
+WIDTH = 490 # Screen width constant
 HEIGHT = int(WIDTH*1.5) # Screen height constant
 
 # initialize the framerate object and clock so that we can standardize framerate
 clock = pg.time.Clock()
-FRAME_RATE = 120
-DT = (1/FRAME_RATE)*1200
+FRAME_RATE = 60
+DT = (1200/FRAME_RATE)
 
 # Set up the drawing window
 screen = pg.display.set_mode([WIDTH, HEIGHT])
@@ -40,10 +40,10 @@ horizontal_lines = [i for i in range(HEIGHT) if i % 20 == 0]
 # initialize objects
 player = dl.Doodler(WIDTH, HEIGHT)
 platforms = []
-platforms.append(plat.Platform((WIDTH//4,int(HEIGHT*0.8))))
+platforms.append(plat.Platform((WIDTH*0.12,HEIGHT*0.8)))
 
 # set gravity strength
-gravity = 0.000012
+gravity = 0.0000033
 
 score = 0
 
@@ -71,12 +71,12 @@ while running:
         # if the player collides with a platform, it should bounce upwards
         if platform.collided_width(player):
             print("The player collided with a platform")
-            player.vel = (player.vel[0], -.1*DT)
+            player.vel = (player.vel[0], -.031*DT)
             player.acc = (player.acc[0], 0)
             player.pos = player.prev_pos
 
     # make the player be affected by gravity
-    player.acc = (player.acc[0], player.acc[1] + gravity*DT)
+    # player.acc = (player.acc[0], player.acc[1] + gravity*DT)
 
     player.move(DT)
 

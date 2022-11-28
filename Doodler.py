@@ -7,12 +7,13 @@ import pygame as pg
 from pygame.locals import RLEACCEL
 
 class Doodler:
-    def __init__(self, WIDTH, HEIGHT):
+    def __init__(self, starting_pos):
         self.img = pg.image.load("doodler.png").convert()
         self.img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
-        self.rect = self.img.get_rect()
-        self.prev_pos = (WIDTH / 2, HEIGHT - 300)
-        self.pos = (WIDTH / 2, HEIGHT - 300)
+        self.height = self.img.get_height()
+        self.width = self.img.get_width()
+        self.prev_pos = starting_pos
+        self.pos = starting_pos
         self.vel = (0, 0)
         self.acc = (0, 0)
         self.score = 0
@@ -24,3 +25,9 @@ class Doodler:
         self.prev_pos = self.pos
         self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
         self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
+
+    def move_right(self):
+        self.pos = (self.pos[0] + 5.5, self.pos[1])
+
+    def move_left(self):
+        self.pos = (self.pos[0] - 5.5, self.pos[1])

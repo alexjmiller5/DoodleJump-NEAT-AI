@@ -8,18 +8,24 @@ from pygame.locals import RLEACCEL
 
 class Doodler:
     def __init__(self, starting_pos):
-        self.img = pg.image.load("doodler.png").convert()
-        self.img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
-        self.height = self.img.get_height()
-        self.width = self.img.get_width()
+        self.left_img = pg.image.load("leftdoodler.png").convert()
+        self.left_img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
+        self.right_img = pg.image.load("rightdoodler.png").convert()
+        self.right_img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
+        self.height = self.left_img.get_height()
+        self.width = self.left_img.get_width()
         self.prev_pos = starting_pos
         self.pos = starting_pos
         self.vel = (0, 0)
         self.acc = (0, 0)
         self.score = 0
+        self.facing_right = True
 
     def display(self, surf):
-        surf.blit(self.img, self.pos)
+        if self.facing_right:
+            surf.blit(self.right_img, self.pos)
+        else:
+            surf.blit(self.left_img, self.pos)
 
     def move(self, dt):
         self.prev_pos = self.pos
@@ -27,7 +33,13 @@ class Doodler:
         self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
 
     def move_right(self):
-        self.pos = (self.pos[0] + 5.5, self.pos[1])
+        self.facing_right = True
+        self.acc = (.002, self.acc[1])
+        if self.vel[0] > 0.4:
+            self.vel = (0.4, self.vel[1])
 
     def move_left(self):
-        self.pos = (self.pos[0] - 5.5, self.pos[1])
+        self.facing_right = False
+        self.acc = (-.002, self.acc[1])
+        if self.vel[0] < -0.4:
+            self.vel = (-0.4, self.vel[1])

@@ -53,6 +53,9 @@ class Platform():
         return intersect(p1, p2, p5, p6) or intersect(p1, p2, p3, p4)
 
     def is_too_close_to(self, other_plat):
+        """detects whether or not this platform is too close to another input
+        platoform object
+        """
         border_length = 1
 
         l1p1 = (self.pos[0] - border_length, self.pos[1] - border_length)

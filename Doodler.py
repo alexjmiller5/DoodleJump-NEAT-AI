@@ -27,19 +27,25 @@ class Doodler:
         else:
             surf.blit(self.left_img, self.pos)
 
+    def land_on_platform(self, dt, platform):
+        self.vel = (self.vel[0], -0.03*dt)
+        self.acc = (self.acc[0], 0)
+        self.pos = (self.pos[0], platform.pos[1] - self.height)
+        self.prev_pos = (self.pos[0], platform.pos[1] - self.height)
+
     def move(self, dt):
         self.prev_pos = self.pos
         self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
         self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
 
-    def move_right(self):
+    def move_right(self, dt):
         self.facing_right = True
-        self.acc = (.002, self.acc[1])
-        if self.vel[0] > 0.4:
-            self.vel = (0.4, self.vel[1])
+        self.acc = (.0001*dt, self.acc[1])
+        if self.vel[0] > 0.02*dt:
+            self.vel = (0.02*dt, self.vel[1])
 
-    def move_left(self):
+    def move_left(self, dt):
         self.facing_right = False
-        self.acc = (-.002, self.acc[1])
-        if self.vel[0] < -0.4:
-            self.vel = (-0.4, self.vel[1])
+        self.acc = (-.0001*dt, self.acc[1])
+        if self.vel[0] < -0.02*dt:
+            self.vel = (-0.02*dt, self.vel[1])

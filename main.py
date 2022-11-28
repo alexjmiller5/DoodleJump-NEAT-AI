@@ -52,7 +52,7 @@ gravity = 0.0000025
 
 # keep track of the number of platforms that will be put on the screen
 # this number will decrease as the player's score gets higher
-total_platform_num = 12
+total_platform_num = 30
 
 # boolean variables to keep track of the game state
 start_game = False
@@ -83,7 +83,7 @@ while running:
 
         # generate the platforms to start off the game with
         while len(platforms) <= total_platform_num:
-            new_plat_pos = (random.random()*(WIDTH - 2*plat_width) + plat_width, random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
+            new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
             new_plat = plat.Platform(new_plat_pos)
             is_too_close = False
             for platform in platforms:
@@ -107,13 +107,13 @@ while running:
 
         # allow the user to move the player via keyboard input if the keys are pressed down
         if keys[K_RIGHT]:
-            player.move_right()
+            player.move_right(DT)
         elif keys[K_LEFT]:
-            player.move_left()
-        elif player.vel[0] > 0.01:
-            player.acc = (-0.002, player.acc[1])
-        elif player.vel[0] < -0.01:
-            player.acc = (0.002, player.acc[1])
+            player.move_left(DT)
+        elif player.vel[0] > 0.0005*DT:
+            player.acc = (-0.0001*DT, player.acc[1])
+        elif player.vel[0] < -0.0005*DT:
+            player.acc = (0.0001*DT, player.acc[1])
         else:
             player.vel = (0, player.vel[1])
             player.acc = (0, player.acc[1])
@@ -122,10 +122,10 @@ while running:
         for event in pg.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_LEFT:
-                    player.vel = (-.02, player.vel[1])
+                    player.vel = (-.001*DT, player.vel[1])
                     player.acc = (0, player.acc[1])
                 if event.key == K_RIGHT:
-                    player.vel = (.02, player.vel[1])
+                    player.vel = (.001*DT, player.vel[1])
                     player.acc = (0, player.acc[1])
 
         # remove offscreen platforms
@@ -138,7 +138,7 @@ while running:
         while len(platforms) <= total_platform_num:
             if tries > 10:
                 break
-            new_plat_pos = (random.random()*(WIDTH - 2*plat_width) + plat_width, -1*platforms[0].height - 20)
+            new_plat_pos = (random.random()*(WIDTH - plat_width), -1*platforms[0].height - 20)
             new_plat = plat.Platform(new_plat_pos)
             is_too_close = False
             for platform in platforms:
@@ -164,6 +164,7 @@ while running:
     ################################################################################################################################################################
     # control movement
     ################################################################################################################################################################
+    
     # make the player be affected by gravity
     player.acc = (player.acc[0], player.acc[1] + gravity*DT)
    
@@ -171,13 +172,10 @@ while running:
 
     # if the player collides with a platform, it will bounce upwards
     for platform in platforms:
-        if platform.collided_width(player) and player.vel[1] > 0:
+        if platform.collided_width(player, screen) and player.vel[1] > 0:
             collision = True
             print("The player collided with a platform")
-            player.vel = (player.vel[0], -0.03*DT)
-            player.acc = (player.acc[0], 0)
-            player.pos = (player.pos[0], platform.pos[1] - player.height)
-            player.prev_pos = (player.pos[0], platform.pos[1] - player.height)
+            player.land_on_platform(DT, platform)
 
     # move the player
     if not collision:
@@ -187,7 +185,8 @@ while running:
     # display everything
     #################################################################################################################################################################
     
-    screen.fill((248, 239, 230)) # Fill the background with DoodleJump color
+    # Fill the background with DoodleJump color
+    screen.fill((248, 239, 230))
 
     # display DoodleJump grid
     for y_pos in horizontal_lines:
@@ -195,14 +194,14 @@ while running:
     for x_pos in vertical_lines:
         pg.draw.line(screen, (233, 225, 214), (x_pos, 0), (x_pos, HEIGHT))
 
-    # display the score
-    score_text = my_font.render(str(int(player.score)), False, (0, 0, 0))
-    screen.blit(score_text, (0.1*WIDTH, 0.066*HEIGHT))
-
     # display all objects
     for platform in platforms:
         platform.display(screen)
     player.display(screen)
+
+        # display the score
+    score_text = my_font.render(str(int(player.score)), False, (0, 0, 0))
+    screen.blit(score_text, (0.1*WIDTH, 0.066*HEIGHT))
 
     # update the screen
     pg.display.flip() 

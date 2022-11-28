@@ -32,24 +32,37 @@ class Platform():
 
         surf.blit(self.img, self.pos)
 
-    def collided_width(self, player):
+    def collided_width(self, player, surf):
         """detect collsions between the line of direction of 
         the input position tuples, using the intersection of the
         lines that returning true if they collide and false if not
         """
-
         p1 = (self.pos[0] + self.width, self.pos[1] + self.height*0.1)
         p2 = (self.pos[0], self.pos[1] + self.height*0.1)
-        p3 = (player.prev_pos[0] + 8, player.prev_pos[1] + player.height)
-        p4 = (player.pos[0] + 8, player.pos[1] + player.height)
-        p5 = (player.prev_pos[0] + 0.6*player.width, player.prev_pos[1] + player.height)
-        p6 = (player.pos[0] + 0.6*player.width, player.pos[1] + player.height)
+        p3 = ()
+        p4 = ()
+        p5 = ()
+        p6 = ()
         
-        # draw the calculated lines for testing purpose
+
+        if player.facing_right:
+            p3 = (player.prev_pos[0] + 0.1*player.width, player.prev_pos[1] + player.height)
+            p4 = (player.pos[0] + 0.1*player.width, player.pos[1] + player.height)
+            p5 = (player.prev_pos[0] + 0.6*player.width, player.prev_pos[1] + player.height)
+            p6 = (player.pos[0] + 0.6*player.width, player.pos[1] + player.height)
+        else:
+            p3 = (player.prev_pos[0] + 0.9*player.width, player.prev_pos[1] + player.height)
+            p4 = (player.pos[0] + 0.9*player.width, player.pos[1] + player.height)
+            p5 = (player.prev_pos[0] + 0.4*player.width, player.prev_pos[1] + player.height)
+            p6 = (player.pos[0] + 0.4*player.width, player.pos[1] + player.height)
+
+
+        # # draw the calculated lines for testing purposes
         # pg.draw.line(surf, (0, 0, 0), p1, p2)
         # pg.draw.line(surf, (0, 0, 0), p3, p4)
         # pg.draw.line(surf, (0, 0, 0), p5, p6)
 
+        
         return intersect(p1, p2, p5, p6) or intersect(p1, p2, p3, p4)
 
     def is_too_close_to(self, other_plat):

@@ -16,3 +16,5 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 - create a starting screen button
 - make sure that the doodler's sideswitching doesn't affect the collision detection
 - make the doodler be able to switch sides of the screen from the edge
+- create a losing screen
+- animate legs to jump

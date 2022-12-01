@@ -47,19 +47,15 @@ platforms.append(plat.Platform((WIDTH*0.12,HEIGHT*0.8)))
 player = dl.Doodler(((WIDTH*0.12, HEIGHT*0.8 - 100)))
 player.pos = (player.pos[0] - 0.5*player.width + 0.5*platforms[0].width + 10, player.pos[1])
 
-# set gravity strength
-gravity = 0.0000025
-
-# keep track of the number of platforms that will be put on the screen
-# this number will decrease as the player's score gets higher
-total_platform_num = 30
-
 # boolean variables to keep track of the game state
 start_game = False
 playing = False
 
 # Run until the user asks to quit
 running = True
+
+# for platform generation control
+prev_score = 0
 
 while running:
 
@@ -81,8 +77,8 @@ while running:
         plat_height = platforms[0].height
         platforms.clear()
 
-        # generate the platforms to start off the game with
-        while len(platforms) <= total_platform_num:
+        # generate the 30 platforms to start off the game with
+        while len(platforms) <= 30:
             new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
             new_plat = plat.Platform(new_plat_pos)
             is_too_close = False
@@ -133,9 +129,22 @@ while running:
             if platform.pos[1] > HEIGHT + platforms[0].height:
                 platforms.remove(platform)
 
-        # add platforms to the top of the screen as the player gets higher and higher
+        ################################################################################################################################################################
+        # platform generation as the player gets higher and higher
+        ################################################################################################################################################################
+
+        # create platforms that are always reachable by the doodler
+        if int(player.score) % 13 == 0 and int(player.score) != prev_score:
+            platforms.append(plat.Platform((random.random()*(WIDTH - plat_width), -100)))
+            prev_score = int(player.score)
+            
+
+        # keep track of the number of platforms that will be put on the screen
+        # this number will decrease as the player's score gets higher and eventually reach 0
+        extra_platform_num = int(30 - player.score**0.5)
+
         tries = 0
-        while len(platforms) <= total_platform_num:
+        while len(platforms) - 4 <= extra_platform_num:
             if tries > 10:
                 break
             new_plat_pos = (random.random()*(WIDTH - plat_width), -1*platforms[0].height - 20)
@@ -149,10 +158,13 @@ while running:
                 tries = 0
             tries += 1
 
+        ################################################################################################################################################################
         # scroll the game upwards as the player gets higher and higher
+        ################################################################################################################################################################
+        
         if player.pos[1] < 0.33*HEIGHT and player.vel[1] < 0:
             offset = player.vel[1]
-            player.score += -offset
+            player.score -= offset
             player.pos = (player.pos[0], player.pos[1] - offset*DT)
             for platform in platforms:
                 platform.pos = (platform.pos[0], platform.pos[1] - offset*DT)
@@ -166,7 +178,7 @@ while running:
     ################################################################################################################################################################
     
     # make the player be affected by gravity
-    player.acc = (player.acc[0], player.acc[1] + gravity*DT)
+    player.apply_gravity(DT)
    
     collision = False
 

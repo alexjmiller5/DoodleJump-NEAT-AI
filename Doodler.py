@@ -18,7 +18,8 @@ class Doodler:
         self.pos = starting_pos
         self.vel = (0, 0)
         self.acc = (0, 0)
-        self.score = 0
+        self.score = 1
+        self.gravity = 0.0000025
         self.facing_right = True
 
     def display(self, surf):
@@ -28,7 +29,7 @@ class Doodler:
             surf.blit(self.left_img, self.pos)
 
     def land_on_platform(self, dt, platform):
-        self.vel = (self.vel[0], -0.03*dt)
+        self.vel = (self.vel[0], -0.03*dt*(self.score**0.05))
         self.acc = (self.acc[0], 0)
         self.pos = (self.pos[0], platform.pos[1] - self.height)
         self.prev_pos = (self.pos[0], platform.pos[1] - self.height)
@@ -37,6 +38,9 @@ class Doodler:
         self.prev_pos = self.pos
         self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
         self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
+
+    def apply_gravity(self, dt):
+        self.acc = (self.acc[0], self.acc[1] + self.gravity*dt*(self.score**0.1))
 
     def move_right(self, dt):
         self.facing_right = True

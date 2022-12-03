@@ -49,7 +49,8 @@ player.pos = (player.pos[0] - 0.5*player.width + 0.5*platforms[0].width + 10, pl
 
 # boolean variables to keep track of the game state
 start_game = False
-playing = False
+player_playing = False
+ai_playing = False
 
 # Run until the user asks to quit
 running = True
@@ -71,7 +72,7 @@ while running:
                 start_game = True
 
     # create the starting when the user starts playing
-    if start_game and not playing:
+    if start_game and not player_playing:
         
         plat_width = platforms[0].width
         plat_height = platforms[0].height
@@ -93,10 +94,10 @@ while running:
         player.vel = (player.vel[0], -0.025*DT)
         player.acc = (0, 0)
         start_game = False
-        playing = True
+        player_playing = True
 
     # work the functionality for the screen when the user has started the game
-    if playing:
+    if player_playing:
 
         # find the keys the are pressed down
         keys = pg.key.get_pressed()
@@ -171,8 +172,8 @@ while running:
 
         # if the player falls below the screen, they lose
         if player.pos[1] > HEIGHT:
-            lose = True
-            
+            player.lost = True
+    
     ################################################################################################################################################################
     # control movement
     ################################################################################################################################################################
@@ -211,9 +212,17 @@ while running:
         platform.display(screen)
     player.display(screen)
 
-        # display the score
-    score_text = my_font.render(str(int(player.score)), False, (0, 0, 0))
-    screen.blit(score_text, (0.1*WIDTH, 0.066*HEIGHT))
+    # display the player's high score on the starting screen
+    if not player.playing:
+        line1 = my_font.render("High Score:", False, (0, 0, 0))
+        line2 = my_font.render(str(player.high_score), False, (0, 0, 0))
+        screen.blit(line1, (0.6*WIDTH, 0.066*HEIGHT))
+        screen.blit(line2, (0.765*WIDTH, 0.133*HEIGHT))
+
+    if player.playing:
+        # display the current score
+        text = my_font.render(str(int(player.score)), False, (0, 0, 0))
+        screen.blit(text, (0.1*WIDTH, 0.066*HEIGHT))
 
     # update the screen
     pg.display.flip() 

@@ -45,10 +45,8 @@ horizontal_lines = [i for i in range(HEIGHT) if i % 20 == 0]
 platforms = []
 platforms.append(plat.Platform((WIDTH*0.12,HEIGHT*0.8)))
 player = dl.Doodler(((WIDTH*0.12, HEIGHT*0.8 - 100)))
-player.pos = (player.pos[0] - 0.5*player.width + 0.5*platforms[0].width + 10, player.pos[1])
 
 # boolean variables to keep track of the game state
-start_game = False
 playing = False
 
 # Run until the user asks to quit
@@ -66,12 +64,12 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-        if event.type == KEYDOWN:
-            if event.key == K_SPACE:
-                start_game = True
+            pg.quit()
+            quit()
+            break
 
     # create the starting when the user starts playing
-    if start_game and not playing:
+    if not playing:
         
         plat_width = platforms[0].width
         plat_height = platforms[0].height
@@ -89,10 +87,10 @@ while running:
                 platforms.append(plat.Platform(new_plat_pos))
 
         # set the player's starting position, velocity and acceleration
+        player.prev_pos = (WIDTH*0.12, HEIGHT*0.8 - 100)
         player.pos = (WIDTH/2, 0.9*HEIGHT)
         player.vel = (player.vel[0], -0.025*DT)
         player.acc = (0, 0)
-        start_game = False
         playing = True
 
     # work the functionality for the screen when the user has started the game
@@ -124,19 +122,19 @@ while running:
                     player.vel = (.001*DT, player.vel[1])
                     player.acc = (0, player.acc[1])
 
-        # remove offscreen platforms
-        for platform in platforms:
-            if platform.pos[1] > HEIGHT + platforms[0].height:
-                platforms.remove(platform)
+        # # remove offscreen platforms
+        # for platform in platforms:
+        #     if platform.pos[1] > HEIGHT + platforms[0].height:
+        #         platforms.remove(platform)
 
         ################################################################################################################################################################
         # platform generation as the player gets higher and higher
         ################################################################################################################################################################
 
         # create platforms that are always reachable by the doodler
-        if int(player.score) % 13 == 0 and int(player.score) != prev_score:
-            platforms.append(plat.Platform((random.random()*(WIDTH - plat_width), -100)))
-            prev_score = int(player.score)
+        # if int(player.score) % 13 == 0 and int(player.score) != prev_score:
+        platforms.append(plat.Platform((random.random()*(WIDTH - plat_width), -100)))
+        prev_score = int(player.score)
             
 
         # keep track of the number of platforms that will be put on the screen
@@ -169,9 +167,10 @@ while running:
             for platform in platforms:
                 platform.pos = (platform.pos[0], platform.pos[1] - offset*DT)
 
-        # if the player falls below the screen, they lose
+        # if the player falls below the screen, they lose (and kill the game)
         if player.pos[1] > HEIGHT:
             lose = True
+            running = False
             
     ################################################################################################################################################################
     # control movement

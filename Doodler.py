@@ -22,7 +22,9 @@ class Doodler:
         self.gravity = 0.0000025
         self.facing_right = True
         self.lost = False
-        self.high_score = 0
+        self.score_line = 0
+        self.collision = False
+        self.dead = False
 
     def display(self, surf):
         if self.facing_right:

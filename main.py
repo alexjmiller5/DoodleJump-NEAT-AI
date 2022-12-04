@@ -5,7 +5,7 @@
 # functionality of the DoodleJump game using pygame
 
 import pygame as pg
-import Doodler as dl
+from Doodler import Doodler
 import plat
 import random
 
@@ -41,16 +41,18 @@ my_font = pg.font.SysFont('Comic Sans MS', 30)
 vertical_lines = [i for i in range(WIDTH) if i % 20 == 0]
 horizontal_lines = [i for i in range(HEIGHT) if i % 20 == 0]
 
+# NEAT variables
+GENERATION_SIZE = 100
+
 # initialize objects
 platforms = []
 platforms.append(plat.Platform((WIDTH*0.12,HEIGHT*0.8)))
-player = dl.Doodler(((WIDTH*0.12, HEIGHT*0.8 - 100)))
+player = Doodler(((WIDTH*0.12, HEIGHT*0.8 - 100)))
 player.pos = (player.pos[0] - 0.5*player.width + 0.5*platforms[0].width + 10, player.pos[1])
 
 # boolean variables to keep track of the game state
 start_game = False
-player_playing = False
-ai_playing = False
+playing = False
 
 # Run until the user asks to quit
 running = True
@@ -72,7 +74,7 @@ while running:
                 start_game = True
 
     # create the starting when the user starts playing
-    if start_game and not player_playing:
+    if start_game and not playing:
         
         plat_width = platforms[0].width
         plat_height = platforms[0].height
@@ -97,7 +99,7 @@ while running:
         player_playing = True
 
     # work the functionality for the screen when the user has started the game
-    if player_playing:
+    if playing:
 
         # find the keys the are pressed down
         keys = pg.key.get_pressed()
@@ -212,14 +214,14 @@ while running:
         platform.display(screen)
     player.display(screen)
 
-    # display the player's high score on the starting screen
-    if not player.playing:
-        line1 = my_font.render("High Score:", False, (0, 0, 0))
-        line2 = my_font.render(str(player.high_score), False, (0, 0, 0))
-        screen.blit(line1, (0.6*WIDTH, 0.066*HEIGHT))
-        screen.blit(line2, (0.765*WIDTH, 0.133*HEIGHT))
+    # # display the player's high score on the starting screen
+    # if not player.playing:
+    #     line1 = my_font.render("High Score:", False, (0, 0, 0))
+    #     line2 = my_font.render(str(player.high_score), False, (0, 0, 0))
+    #     screen.blit(line1, (0.6*WIDTH, 0.066*HEIGHT))
+    #     screen.blit(line2, (0.765*WIDTH, 0.133*HEIGHT))
 
-    if player.playing:
+    if playing:
         # display the current score
         text = my_font.render(str(int(player.score)), False, (0, 0, 0))
         screen.blit(text, (0.1*WIDTH, 0.066*HEIGHT))

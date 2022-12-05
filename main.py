@@ -90,16 +90,14 @@ while running:
         doodler.ai_move(DT)
 
     # create platforms that are always reachable by the doodler
-    if int(best_doodler.score) % 13 == 0 and int(best_doodler.score) != prev_score:
+    if int(best_doodler.score) % 260 == 0 and int(best_doodler.score) != prev_score:
         platforms.append(Platform((random.random()*(WIDTH - plat_width), -100)))
         prev_score = int(best_doodler.score)
 
     # keep track of the number of platforms that will be put on the screen
     # this number will decrease as the player's score gets higher and eventually reach 0
     doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
-    extra_platform_num = int((30 - best_doodler.score**0.5)*doodler_change)
-
-    print(extra_platform_num)
+    extra_platform_num = int((30 - (best_doodler.score/20)**0.5)*doodler_change)
 
     tries = 0
     while len(platforms) - 4 <= extra_platform_num:
@@ -125,8 +123,8 @@ while running:
         for doodler in doodlers:
             if doodler != best_doodler:
                 doodler.pos = (doodler.pos[0], doodler.pos[1] - offset*DT)
-                doodler.score_line -= offset
-        best_doodler.score -= offset
+                doodler.score_line -= offset*DT
+        best_doodler.score -= offset*DT
         best_doodler.pos = (best_doodler.pos[0], best_doodler.pos[1] - offset*DT)
         for platform in platforms:
             platform.pos = (platform.pos[0], platform.pos[1] - offset*DT)
@@ -137,16 +135,20 @@ while running:
 
     for doodler in doodlers:
         offset = doodler.vel[1]
-        if doodler.pos[1] < doodler.score_line and offset < 0:
-            doodler.score -= offset
-            doodler.score_line += offset
-    
+        if doodler.pos[1] < doodler.score_line and offset < 0 and doodler != best_doodler:
+            doodler.score -= offset*DT
+            doodler.score_line += offset*DT
+
+    ################################################################################################################################################################
+    # control doodler loss condition
+    ################################################################################################################################################################
+
     for doodler in doodlers:
         if doodler.pos[1] > doodler.score_line + 0.66*HEIGHT + doodler.height:
-            dead_doodlers.append(doodler)
             doodler.dead = True
+            dead_doodlers.append(doodler)
             doodlers.remove(doodler)
-
+    
     if len(doodlers) == 0:
         pg.quit()
         break
@@ -160,7 +162,6 @@ while running:
             doodler.pos = (-doodler.width, doodler.pos[1])
         if doodler.pos[0] < -doodler.width:
             doodler.pos = (WIDTH, doodler.pos[1])
-
 
     ################################################################################################################################################################
     # control movement

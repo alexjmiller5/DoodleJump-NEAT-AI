@@ -25,7 +25,6 @@ class Doodler:
         self.lost = False
         self.score_line = 0
         self.collision = False
-        self.dead = False
 
     def display(self, surf):
         if self.facing_right:
@@ -40,9 +39,10 @@ class Doodler:
         self.prev_pos = (self.pos[0], platform.pos[1] - self.height)
 
     def move(self, dt):
-        self.prev_pos = self.pos
-        self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
-        self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
+        if not self.collision:
+            self.prev_pos = self.pos
+            self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
+            self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
 
     def apply_gravity(self, dt):
         self.acc = (self.acc[0], self.acc[1] + self.gravity*dt*(self.score**0.1))
@@ -65,3 +65,12 @@ class Doodler:
             self.move_right(dt)
         elif chance < 0.66:
             self.move_left(dt)
+
+    def is_dead(self, screen_height):
+        return self.pos[1] > self.score_line + 0.66*screen_height + self.height
+
+    def screen_wrap(self, screen_width):
+        if self.pos[0] > screen_width:
+            self.pos = (-self.width, self.pos[1])
+        if self.pos[0] < -self.width:
+            self.pos = (screen_width, self.pos[1])

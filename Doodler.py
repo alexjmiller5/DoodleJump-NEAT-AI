@@ -4,6 +4,7 @@
 # File description (Doodler.py): creates a 
 # class for the player of the game
 import pygame as pg
+import random
 from pygame.locals import RLEACCEL
 
 class Doodler:
@@ -21,6 +22,10 @@ class Doodler:
         self.score = 1
         self.gravity = 0.0000025
         self.facing_right = True
+        self.lost = False
+        self.score_line = 0
+        self.collision = False
+        self.dead = False
 
     def display(self, surf):
         if self.facing_right:
@@ -53,3 +58,10 @@ class Doodler:
         self.acc = (-.0001*dt, self.acc[1])
         if self.vel[0] < -0.02*dt:
             self.vel = (-0.02*dt, self.vel[1])
+
+    def ai_move(self, dt):
+        chance = random.random()
+        if chance < 0.33:
+            self.move_right(dt)
+        elif chance < 0.66:
+            self.move_left(dt)

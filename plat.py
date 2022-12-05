@@ -32,7 +32,7 @@ class Platform():
 
         surf.blit(self.img, self.pos)
 
-    def collided_width(self, player, surf):
+    def collided_width(self, player):
         """detect collsions between the line of direction of 
         the input position tuples, using the intersection of the
         lines that returning true if they collide and false if not

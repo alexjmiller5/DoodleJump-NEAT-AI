@@ -114,7 +114,7 @@ def eval_genomes(genomes, config):
         ################################################################################################################################################################
 
         # create platforms that are always reachable by the doodler
-        if int(best_doodler.score) % 13 == 0 and int(best_doodler.score) != prev_score:
+        if int(best_doodler.score) % 17 == 0 and int(best_doodler.score) != prev_score:
             platforms.append(Platform((random.random()*(WIDTH - plat_width), -100)))
             prev_score = int(best_doodler.score)
 
@@ -200,6 +200,9 @@ def eval_genomes(genomes, config):
                     if platform.collided_width(doodler) and doodler.vel[1] > 0:
                         doodler.collision = True
                         doodler.land_on_platform(DT, platform)
+
+                        # update hitPlatforms
+                        hitPlatforms[player_id] = platform_id
                     elif platform.collided_width(doodler):
                         # reward player for hitting higher platform
                         if platform_id > hitPlatforms[player_id]:
@@ -210,7 +213,6 @@ def eval_genomes(genomes, config):
                             ge[player_id].fitness -= 0.5
 
                         hitPlatforms[player_id] = platform_id
-                    
 
         # move the player
         for doodler in doodlers:
@@ -258,21 +260,23 @@ def eval_genomes(genomes, config):
         for player_id, player in enumerate(doodlers):
             # Variables for Input layer
             # I am thinking about having the input being the next cloest platform
-            # so variable name: nextPlat_right, nextPlat_left, nextPlat_hight, play_place
 
             try:
                 next_platform = platforms[hitPlatforms[player_id]+1]
             except:
-                next_platform = platforms[hitPlatforms[player_id]]
+                print(player_id)
+                print(hitPlatforms[player_id])
+                print(len(platforms))
 
             # calculate the distance between 
             next_platform_x, next_platform_y = next_platform.pos
-
             player_x, player_y = player.pos
 
             x_distance = next_platform_x - player_x
-
             y_distance = next_platform_y - player_y
+
+            # display out the distance using red line so we can see the actual process
+            pg.draw.line(screen, (255, 0, 0), player.pos, next_platform.pos)
 
             #feed the networks with myplace, next obstacle distance, next obstacle hight, next obstacle widht of each player
             
@@ -282,6 +286,9 @@ def eval_genomes(genomes, config):
                 player.move_left(DT)
             if output[1] > 0.5:
                 player.move_right(DT)
+
+        # draw out the red lines
+        pg.display.flip() 
 
 def run(config_file):
     # start the neat algorithm based on the congifuration file

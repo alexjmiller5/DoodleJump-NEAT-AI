@@ -32,7 +32,7 @@ vertical_lines = [i for i in range(WIDTH) if i % 20 == 0]
 horizontal_lines = [i for i in range(HEIGHT) if i % 20 == 0]
 
 # NEAT variables
-GENERATION_SIZE = 100
+GENERATION_SIZE = 20
 
 # initialize objects
 platforms = []
@@ -99,13 +99,11 @@ while running:
     doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
     extra_platform_num = int((30 - best_doodler.score**0.5)*doodler_change)
 
-    print(extra_platform_num)
-
     tries = 0
     while len(platforms) - 4 <= extra_platform_num:
         if tries > 10:
             break
-        new_plat_pos = (random.random()*(WIDTH - plat_width), -1*plat_height - 20 - random.random()*HEIGHT)
+        new_plat_pos = (random.random()*(WIDTH - plat_width), -1*plat_height - 20)
         new_plat = Platform(new_plat_pos)
         is_too_close = False
         for platform in platforms:

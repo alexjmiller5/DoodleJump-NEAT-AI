@@ -1,7 +1,7 @@
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 100
-pop_size              = 2
+fitness_threshold     = 10000
+pop_size              = 20
 reset_on_extinction   = True
 
 [DefaultGenome]
@@ -70,6 +70,7 @@ weight_replace_rate     = 0.1
 compatibility_threshold = 3.0
 
 [DefaultStagnation]
+# if 20 generations has passed, no improvement made, terminate program.
 species_fitness_func = max
 max_stagnation       = 20
 species_elitism      = 2

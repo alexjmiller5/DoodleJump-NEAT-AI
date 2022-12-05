@@ -61,17 +61,6 @@ def eval_genomes(genomes, config):
     # for platform generation control
     prev_score = 0
 
-    # generate initial platforms
-    while len(platforms) <= 30:
-        new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
-        new_plat = Platform(new_plat_pos)
-        is_too_close = False
-        for platform in platforms:
-            if new_plat.is_too_close_to(platform):
-                is_too_close = True
-        if not is_too_close:
-            platforms.append(Platform(new_plat_pos))
-
     ####################################################################################################
     # neat-AI setup
     ####################################################################################################
@@ -133,8 +122,6 @@ def eval_genomes(genomes, config):
         # this number will decrease as the player's score gets higher and eventually reach 0
         doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
         extra_platform_num = int((30 - best_doodler.score**0.5)*doodler_change)
-
-        print(extra_platform_num)
 
         tries = 0
         while len(platforms) - 4 <= extra_platform_num:

@@ -1,41 +1,15 @@
-
 import os
 import neat
-import random
 
 import pygame as pg
+
 from Doodler import *
 from plat import *
-
 
 # fitness function for NEAT, will be called everytime a new generation starts
 def eval_genomes(genomes, config):
 
     print("eval_genomes called")
-
-    ####################################################################################################
-    # neat-AI setup
-    ####################################################################################################
-    networks = []  # for all doodlers' neural network
-    ge = []        # list for neat-python's genums
-    doodlers = []  # each doodlers
-
-    # list which holds the index of the last hiting platform for each player 
-    hitPlatforms = []
-
-    # number of iteration will base on POP_SIZE in the configuration file
-    for genome_id, genome in genomes: 
-        genome.fitness = 0  # start with fitness level of 0
-        network = neat.nn.FeedForwardNetwork.create(genome, config) # create a network for the genome
-        networks.append(network)
-        ge.append(genome)
-
-        doodler = Doodler((WIDTH/2, 0.9*HEIGHT))
-        doodler.vel = (0, -0.025*DT)
-        doodler.score_line = 0.33*HEIGHT
-
-        doodlers.append(doodler)
-        hitPlatforms.append(0)
 
     ####################################################################################################
     # game setup portion from main with modification:
@@ -86,6 +60,41 @@ def eval_genomes(genomes, config):
 
     # for platform generation control
     prev_score = 0
+
+    # generate initial platforms
+    while len(platforms) <= 30:
+        new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
+        new_plat = Platform(new_plat_pos)
+        is_too_close = False
+        for platform in platforms:
+            if new_plat.is_too_close_to(platform):
+                is_too_close = True
+        if not is_too_close:
+            platforms.append(Platform(new_plat_pos))
+
+    ####################################################################################################
+    # neat-AI setup
+    ####################################################################################################
+    networks = []  # for all doodlers' neural network
+    ge = []        # list for neat-python's genums
+    doodlers = []  # each doodlers
+
+    # list which holds the index of the last hiting platform for each player 
+    hitPlatforms = []
+
+    # number of iteration will base on POP_SIZE in the configuration file
+    for genome_id, genome in genomes: 
+        genome.fitness = 0  # start with fitness level of 0
+        network = neat.nn.FeedForwardNetwork.create(genome, config) # create a network for the genome
+        networks.append(network)
+        ge.append(genome)
+
+        doodler = Doodler((WIDTH/2, 0.9*HEIGHT))
+        doodler.vel = (0, -0.025*DT)
+        doodler.score_line = 0.33*HEIGHT
+
+        doodlers.append(doodler)
+        hitPlatforms.append(0)
     
     while running:
 
@@ -213,7 +222,7 @@ def eval_genomes(genomes, config):
                         if  platform_id < hitPlatforms[player_id]:
                             ge[player_id].fitness -= 0.5
 
-                        hitPlatforms[player_id]= platform_id
+                        hitPlatforms[player_id] = platform_id
                     
 
         # move the player
@@ -263,7 +272,11 @@ def eval_genomes(genomes, config):
             # Variables for Input layer
             # I am thinking about having the input being the next cloest platform
             # so variable name: nextPlat_right, nextPlat_left, nextPlat_hight, play_place
-            next_platform = platforms[hitPlatforms[player_id]+1]
+
+            try:
+                next_platform = platforms[hitPlatforms[player_id]+1]
+            except:
+                next_platform = platforms[hitPlatforms[player_id]]
 
             # calculate the distance between 
             next_platform_x, next_platform_y = next_platform.pos
@@ -282,7 +295,6 @@ def eval_genomes(genomes, config):
                 player.move_left(DT)
             if output[1] > 0.5:
                 player.move_right(DT)
-
 
 def run(config_file):
     # start the neat algorithm based on the congifuration file
@@ -305,6 +317,9 @@ def run(config_file):
 
 
 if __name__ == '__main__':
-    current_path = os.path.dirname(__file__)
-    config_path = os.path.join(current_path, 'config-feedforward.txt')
+    # Determine path to configuration file. This path manipulation is
+    # here so that the script will run successfully regardless of the
+    # current working directory.
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config-feedforward.txt')
     run(config_path)

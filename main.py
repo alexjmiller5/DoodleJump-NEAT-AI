@@ -40,11 +40,9 @@ temp_plat = Platform((0,0))
 plat_width = temp_plat.width
 plat_height = temp_plat.height
 
-tries = 0
+# generate initial platforms
 while len(platforms) <= 30:
-    if tries > 10:
-        break
-    new_plat_pos = (random.random()*(WIDTH - plat_width), -1*plat_height - 20)
+    new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
     new_plat = Platform(new_plat_pos)
     is_too_close = False
     for platform in platforms:
@@ -52,10 +50,6 @@ while len(platforms) <= 30:
             is_too_close = True
     if not is_too_close:
         platforms.append(Platform(new_plat_pos))
-        tries = 0
-    tries += 1
-
-
 
 doodlers = [Doodler((WIDTH/2, 0.9*HEIGHT)) for i in range(GENERATION_SIZE)]
 for doodler in doodlers:
@@ -92,22 +86,26 @@ while running:
     # platform generation as the best doodler gets higher and higher
     ################################################################################################################################################################
 
+    for doodler in doodlers:
+        doodler.ai_move(DT)
+
     # create platforms that are always reachable by the doodler
     if int(best_doodler.score) % 13 == 0 and int(best_doodler.score) != prev_score:
         platforms.append(Platform((random.random()*(WIDTH - plat_width), -100)))
         prev_score = int(best_doodler.score)
-        
 
     # keep track of the number of platforms that will be put on the screen
     # this number will decrease as the player's score gets higher and eventually reach 0
-    doodler_change = (worst_doodler.score_line - 0.33*HEIGHT)/HEIGHT
+    doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
     extra_platform_num = int((30 - best_doodler.score**0.5)*doodler_change)
+
+    print(extra_platform_num)
 
     tries = 0
     while len(platforms) - 4 <= extra_platform_num:
         if tries > 10:
             break
-        new_plat_pos = (random.random()*(WIDTH - plat_width), -1*platforms[0].height - 20)
+        new_plat_pos = (random.random()*(WIDTH - plat_width), -1*plat_height - 20 - random.random()*HEIGHT)
         new_plat = Platform(new_plat_pos)
         is_too_close = False
         for platform in platforms:
@@ -121,7 +119,7 @@ while running:
     ################################################################################################################################################################
     # scroll the game upwards as the best doodler gets higher and higher
     ################################################################################################################################################################
-    
+
     if best_doodler.pos[1] < 0.33*HEIGHT and best_doodler.vel[1] < 0:
         offset = best_doodler.vel[1]
         for doodler in doodlers:
@@ -132,26 +130,37 @@ while running:
         best_doodler.pos = (best_doodler.pos[0], best_doodler.pos[1] - offset*DT)
         for platform in platforms:
             platform.pos = (platform.pos[0], platform.pos[1] - offset*DT)
-    
+
     ################################################################################################################################################################
     # control doodler scores and loss condition
     ################################################################################################################################################################
-   
+
     for doodler in doodlers:
         offset = doodler.vel[1]
         if doodler.pos[1] < doodler.score_line and offset < 0:
             doodler.score -= offset
             doodler.score_line += offset
     
-    for i in range(len(doodlers)):
-        if doodlers[i].pos[1] < doodlers[i].score_line - 0.5*HEIGHT - doodlers[i].height:
+    for doodler in doodlers:
+        if doodler.pos[1] > doodler.score_line + 0.66*HEIGHT + doodler.height:
             dead_doodlers.append(doodler)
             doodler.dead = True
-            doodlers.pop(i)
+            doodlers.remove(doodler)
 
     if len(doodlers) == 0:
         pg.quit()
         break
+
+    ################################################################################################################################################################
+    # wrap the doodlers' position around the screen
+    ################################################################################################################################################################
+    
+    for doodler in doodlers:
+        if doodler.pos[0] > WIDTH:
+            doodler.pos = (-doodler.width, doodler.pos[1])
+        if doodler.pos[0] < -doodler.width:
+            doodler.pos = (WIDTH, doodler.pos[1])
+
 
     ################################################################################################################################################################
     # control movement
@@ -175,8 +184,9 @@ while running:
         if not doodler.collision:
             doodler.move(DT)
 
+    pg.draw.line(screen, (0,0,0), (0,worst_doodler.pos[1] - HEIGHT*0.5 - plat_height), (WIDTH,worst_doodler.pos[1] - HEIGHT*0.5 - plat_height))
     for platform in platforms:
-        if platform.pos[1] < worst_doodler.pos[1] - HEIGHT*0.5 - plat_height:
+        if platform.pos[1] > worst_doodler.pos[1] + HEIGHT*0.66 + plat_height:
             platforms.remove(platform)
 
     ################################################################################################################################################################

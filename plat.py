@@ -98,8 +98,9 @@ class Platform():
 
         return (intersect(l1p1, l1p2, l3p1, l3p2) or intersect(l1p1, l1p2, l4p1, l4p2) or intersect(l2p1, l2p2, l3p1, l3p2) or intersect(l2p1, l2p2, l4p1, l4p2))
 
-    def move(self):
-        if self.pos[0] > 
+    def move(self, screen_width):
+        if self.pos[0] > screen_width - self.width:
+            
 
 def intersect(p1, p2, p3, p4):
     """helper function for the collsion detection, detects if two line segments intersect

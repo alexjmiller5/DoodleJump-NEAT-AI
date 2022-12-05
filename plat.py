@@ -15,6 +15,7 @@ class Platform():
         self.height = self.img.get_height()
         self.width = self.img.get_width()
         self.type = type
+        self.vel = 1
 
     def display(self, surf):
         """displays the platform on the input pygame surface
@@ -73,7 +74,7 @@ class Platform():
         platoform object
         """
         border_length = 1
-
+        
         if self.type == "still":
             l1p1 = (self.pos[0] - border_length, self.pos[1] - border_length)
             l1p2 = (self.pos[0] - border_length, self.pos[1] + border_length + self.height)
@@ -84,7 +85,6 @@ class Platform():
             l1p2 = (screen_width, self.pos[1] + border_length + self.height)
             l2p1 = (0, self.pos[1] - border_length)
             l2p2 = (screen_width, self.pos[1] + border_length + self.height)
-
         if other_plat.type == "still":
             l3p1 = (other_plat.pos[0] - border_length, other_plat.pos[1] - border_length)
             l3p2 = (other_plat.pos[0] + other_plat.width + border_length, other_plat.pos[1] - border_length)
@@ -99,7 +99,13 @@ class Platform():
         return (intersect(l1p1, l1p2, l3p1, l3p2) or intersect(l1p1, l1p2, l4p1, l4p2) or intersect(l2p1, l2p2, l3p1, l3p2) or intersect(l2p1, l2p2, l4p1, l4p2))
 
     def move(self, screen_width):
-        if self.pos[0] > screen_width - self.width:
+        self.pos = (self.pos[0] + self.vel, self.pos[1])
+        self.screen_wrap(screen_width)
+    
+    def screen_wrap(self, screen_width):
+        if self.pos[0] > screen_width - self.width or self.pos[0] < self.width:
+            self.vel = -self.vel
+            
             
 
 def intersect(p1, p2, p3, p4):

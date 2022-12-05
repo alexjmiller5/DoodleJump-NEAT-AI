@@ -50,10 +50,10 @@ while len(platforms) <= 30:
     new_plat = Platform(new_plat_pos, "still")
     is_too_close = False
     for platform in platforms:
-        if new_plat.is_too_close_to(platform):
+        if new_plat.is_too_close_to(platform, WIDTH):
             is_too_close = True
     if not is_too_close:
-        platforms.append(Platform(new_plat_pos, "still"))
+        platforms.append(new_plat)
 
 # set initial doodler variables
 for doodler in doodlers:
@@ -130,10 +130,10 @@ while True:
         new_plat = Platform(new_plat_pos, new_plat_type)
         is_too_close = False
         for platform in platforms:
-            if new_plat.is_too_close_to(platform):
+            if new_plat.is_too_close_to(platform, WIDTH):
                 is_too_close = True
         if not is_too_close:
-            platforms.append(Platform(new_plat_pos, WIDTH))
+            platforms.append(Platform(new_plat_pos, new_plat_type))
             tries = 0
         tries += 1
 

@@ -48,6 +48,7 @@ def eval_genomes(genomes, config):
     platforms = []
     platforms.append(Platform((WIDTH/2, HEIGHT - 50), "still"))
 
+
     # generate initial platforms
     while len(platforms) <= 10:
         new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
@@ -76,8 +77,11 @@ def eval_genomes(genomes, config):
     ge = []        # list for neat-python's genums
     doodlers = []  # each doodlers
 
-    # list which holds the index of the last hiting platform for each player 
+    # list to holds the last highest-hiting platform for each player 
     hitPlatforms = []
+
+    for _ in range(len(genomes)):
+        hitPlatforms.append(platforms[0])
 
     # number of iteration will base on POP_SIZE in the configuration file
     for genome_id, genome in genomes: 
@@ -91,7 +95,6 @@ def eval_genomes(genomes, config):
         doodler.score_line = 0.33*HEIGHT
 
         doodlers.append(doodler)
-        hitPlatforms.append(0)
     
     # Run until the user asks to quit
     while True:
@@ -244,19 +247,26 @@ def eval_genomes(genomes, config):
                     doodler.collision = True
                     doodler.land_on_platform(DT, platform)
 
-                    # update hitPlatforms
-                    hitPlatforms[player_id] = platform_id
+                    print(platform.pos[1], hitPlatforms[player_id].pos[1])
                 
-                if platform.collided_width(doodler):
                     # reward player for hitting higher platform
-                    if platform_id > hitPlatforms[player_id]:
-                        ge[player_id].fitness += 0.1
-                    
-                    # punish player for hitting lower or same platform
-                    if  platform_id <= hitPlatforms[player_id]:
-                        ge[player_id].fitness -= 0.05
+                    if platform.pos[1] < hitPlatforms[player_id].pos[1]:
 
-                    hitPlatforms[player_id] = platform_id
+                        print("rewarding player {}".format(player_id))
+                        print(ge[player_id].fitness, ge[player_id].fitness + 0.1)
+                        print()
+                        ge[player_id].fitness += 0.1
+
+                        # also update hitPlatforms
+                        hitPlatforms[player_id] = platform
+                    
+                    elif platform == hitPlatforms[player_id]:
+                        # punish player for hitting same platform
+                        # need to punish those m**f hard so they LEARN!!
+                        print("punishing player {} for hitting same platform".format(player_id))
+                        print(ge[player_id].fitness, ge[player_id].fitness - 0.05)
+                        print()
+                        ge[player_id].fitness -= 5
 
         # move the player
         for doodler in doodlers:
@@ -305,9 +315,9 @@ def eval_genomes(genomes, config):
         pg.display.flip() 
 
         # reward the living doodlers
-        for player_id, player in enumerate(doodlers):
-            if player not in dead_doodlers:
-                ge[player_id].fitness += 0.1
+        # for player_id, player in enumerate(doodlers):
+        #     if player not in dead_doodlers:
+        #         ge[player_id].fitness += 0.1
 
         for player_id, player in enumerate(doodlers):
             # Variables for Input layer
@@ -360,9 +370,9 @@ def eval_genomes(genomes, config):
                                                     cloest_platform_below_dist_x, cloest_platform_below_dist_y,
                                                     player.vel[1]))
 
-            if output[0] > 0:
+            if output[0] > 0.5:
                 player.update_movement(DT, True, False)
-            if output[1] > 0:
+            if output[1] > 0.5:
                 player.update_movement(DT, False, True)
 
         # draw out the red lines

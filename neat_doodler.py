@@ -226,14 +226,14 @@ def eval_genomes(genomes, config):
         # wrap the doodlers' position around the screen
         ################################################################################################################################################################
         
-        # for doodler in doodlers:
-        #     doodler.screen_wrap(WIDTH)
+        for doodler in doodlers:
+            doodler.screen_wrap(WIDTH)
 
-        #     for doodler in doodlers:
-        #         if doodler.pos[0] > WIDTH:
-        #             doodler.pos = (-doodler.width, doodler.pos[1])
-        #         if doodler.pos[0] < -doodler.width:
-        #             doodler.pos = (WIDTH, doodler.pos[1])
+            for doodler in doodlers:
+                if doodler.pos[0] > WIDTH:
+                    doodler.pos = (-doodler.width, doodler.pos[1])
+                if doodler.pos[0] < -doodler.width:
+                    doodler.pos = (WIDTH, doodler.pos[1])
 
         # make the player be affected by gravity
         for doodler in doodlers:
@@ -255,7 +255,7 @@ def eval_genomes(genomes, config):
                         print("rewarding player {}".format(player_id))
                         print(ge[player_id].fitness, ge[player_id].fitness + 0.1)
                         print()
-                        ge[player_id].fitness += 0.1
+                        ge[player_id].fitness += 1
 
                         # also update hitPlatforms
                         hitPlatforms[player_id] = platform

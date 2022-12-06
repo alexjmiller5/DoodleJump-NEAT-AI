@@ -23,15 +23,15 @@ class Platform():
         """
 
         # display a box around the platform for testing purposes
-        # l1p1 = (self.pos[0] - 15, self.pos[1] - 15)
-        # l1p2 = (self.pos[0] - 15, self.pos[1] + 15 + self.height)
-        # l2p1 = (self.pos[0] + self.width + 15, self.pos[1] - 15)
-        # l2p2 = (self.pos[0] + self.width + 15, self.pos[1] + 15 + self.height)
+        l1p1 = (self.pos[0], self.pos[1])
+        l1p2 = (self.pos[0], self.pos[1] + self.height)
+        l2p1 = (self.pos[0] + self.width, self.pos[1])
+        l2p2 = (self.pos[0] + self.width, self.pos[1] + self.height)
         
-        # pg.draw.line(surf, (0, 0, 0), l1p1, l2p1)
-        # pg.draw.line(surf, (0, 0, 0), l2p2, l1p2)
-        # pg.draw.line(surf, (0, 0, 0), l1p1, l1p2)
-        # pg.draw.line(surf, (0, 0, 0), l2p1, l2p2)
+        pg.draw.line(surf, (0, 0, 0), l1p1, l2p1)
+        pg.draw.line(surf, (0, 0, 0), l2p2, l1p2)
+        pg.draw.line(surf, (0, 0, 0), l1p1, l1p2)
+        pg.draw.line(surf, (0, 0, 0), l2p1, l2p2)
 
         surf.blit(self.img, self.pos)
 

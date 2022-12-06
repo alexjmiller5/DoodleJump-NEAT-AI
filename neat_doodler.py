@@ -259,30 +259,47 @@ def eval_genomes(genomes, config):
 
         for player_id, player in enumerate(doodlers):
             # Variables for Input layer
-            # I am thinking about having the input being the next cloest platform
-
-            try:
-                next_platform = platforms[hitPlatforms[player_id]+1]
-            except:
-                print(player_id)
-                print(player == best_doodler)
-                print(hitPlatforms[player_id])
-                print(len(platforms))
-                quit()
 
             # calculate the distance between 
-            next_platform_x, next_platform_y = next_platform.pos
             player_x, player_y = player.pos
 
-            x_distance = next_platform_x - player_x
-            y_distance = next_platform_y - player_y
+            cloest_platform_above_x = 0
+            cloest_platform_above_y = 0
+            cloest_platform_above_dist = float("inf")
 
-            # display out the distance using red line so we can see the actual process
-            pg.draw.line(screen, (255, 0, 0), player.pos, next_platform.pos)
+            cloest_platform_below_x, cloest_platform_below_y = platforms[-1].pos
+            cloest_platform_below_dist = float("inf")
 
-            #feed the networks with myplace, next obstacle distance, next obstacle hight, next obstacle widht of each player
-            
-            output = networks[player_id].activate((x_distance, y_distance))
+            for platform in platforms:
+                platform_x, platform_y = platform.pos
+
+                dist = (player_x - platform_x)**2 + (player_y - platform_y)**2
+
+                # platform is above and is closer than current cloest
+                if platform_y < player_y and dist < cloest_platform_above_dist:
+                    # replace cloest_platform_above
+                    cloest_platform_above_x = platform_x
+                    cloest_platform_above_y = platform_y
+                    cloest_platform_above_dist = dist
+                
+                # platform is below and is closer than current cloest
+                if platform_y > player_y and dist < cloest_platform_below_dist:
+                    # replace cloest_platform_below
+                    cloest_platform_below_x = platform_x
+                    cloest_platform_below_y = platform_y
+                    cloest_platform_below_dist = dist
+
+            cloest_platform_above = (cloest_platform_above_x, cloest_platform_above_y)
+            cloest_platform_below = (cloest_platform_below_x, cloest_platform_below_y)
+
+            # display the input on-screen so we can see the learning process
+            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_above)
+            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_below)
+
+            #feed the networks
+            output = networks[player_id].activate((cloest_platform_above_x, cloest_platform_above_y, 
+                                                    cloest_platform_below_x, cloest_platform_below_y,
+                                                    player_x, player_y, player.vel[1]))
 
             if output[0] > 0.5:
                 player.move_left(DT)

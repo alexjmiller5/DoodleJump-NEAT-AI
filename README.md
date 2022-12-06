@@ -19,3 +19,4 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 - create a losing screen
 - animate legs to jump
 - make it so that when the doodler changes the way it's facing it looks nicer
+- change is_view_of function to work preoperly

@@ -5,11 +5,12 @@
 # functionality of the DoodleJump game using pygame
 
 import pygame as pg
-from Doodler import *
-from plat import *
+from Doodler import Doodler
+from plat import Platform
 import random
 
 pg.init()
+pg.display.init()
 
 WIDTH = 493 # Screen width constant
 HEIGHT = int(WIDTH*1.5) # Screen height constant
@@ -68,6 +69,10 @@ while True:
 
     # this will standardize speeds based on framerate
     clock.tick(FRAME_RATE)
+
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            quit()
 
     # Detemine the best and worst doodlers based on their scores
     best_doodler = doodlers[0]
@@ -237,7 +242,7 @@ while True:
         if doodler.pos[1] < HEIGHT + doodler.height:
             doodler.display(screen)
 
-    # display the current score
+    # display the best doodler's score
     text = my_font.render(str(int(best_doodler.score)), False, (0, 0, 0))
     screen.blit(text, (0.1*WIDTH, 0.066*HEIGHT))
 

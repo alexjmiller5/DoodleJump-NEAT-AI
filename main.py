@@ -38,16 +38,6 @@ plat_width = temp_plat.width
 plat_height = temp_plat.height
 
 # NEAT variables
-GENERATION_SIZE = 100
-
-# initialize object lists
-platforms = []
-doodlers = [Doodler((WIDTH/2, 0.9*HEIGHT)) for i in range(GENERATION_SIZE)]
-dead_doodlers = []
-
-platforms.append(Platform((WIDTH/2, HEIGHT - 50), "still"))
-
-# NEAT variables
 GENERATION_SIZE = 20
 
 # initialize object lists

@@ -296,9 +296,6 @@ def eval_genomes(genomes, config):
         # update the screen
         pg.display.flip() 
 
-        # update score keeper as well
-        best_doodler_score_keeper = int(best_doodler.score)
-
         # reward the living doodlers
         for player_id, player in enumerate(doodlers):
             if player not in dead_doodlers:
@@ -356,10 +353,17 @@ def eval_genomes(genomes, config):
         # draw out the red lines
         pg.display.flip() 
 
-        # if the best doodler survive 30 seconds without actually increase the score
+        # update best_doodler_score_keeper every 5 seconds
+        if int(time.time() - start_time) % 5 == 0:
+            # update score keeper as well
+            best_doodler_score_keeper = int(best_doodler.score)
+
+        # check every 10 seconds
+        # if the best doodler survive without actually increase the score
         # it probably doing-back-and-forth movement
         # kill the generation
-        if time.time() - start_time > 30 and best_doodler_score_keeper == int(best_doodler.score):
+        # did plus 1 so the game doesn't quit right at launch
+        if int(time.time() + 1 - start_time) % 10 == 0 and best_doodler_score_keeper == int(best_doodler.score):
             pg.quit()
 
 def run(config_file):

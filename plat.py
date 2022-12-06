@@ -68,7 +68,7 @@ class Platform():
         return intersect(p1, p2, p5, p6) or intersect(p1, p2, p3, p4)
 
     def in_view_of(self, doodler, screen_height):
-        return self.pos[1] > doodler.score_line - 0.5*screen_height - self.height
+        return self.pos[1] < doodler.score_line + 0.66*screen_height + self.height
 
     def is_too_close_to(self, other_plat, screen_width):
         """detects whether or not this platform is too close to another input

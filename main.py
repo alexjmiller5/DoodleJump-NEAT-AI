@@ -46,7 +46,7 @@ doodlers = [Doodler((WIDTH/2, 0.9*HEIGHT)) for i in range(GENERATION_SIZE)]
 dead_doodlers = []
 
 # generate initial platforms
-while len(platforms) <= 30:
+while len(platforms) <= 10:
     new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
     new_plat = Platform(new_plat_pos, "still")
     is_too_close = False
@@ -70,6 +70,7 @@ while True:
     # this will standardize speeds based on framerate
     clock.tick(FRAME_RATE)
 
+    # necessary to quit pygame correctly
     for event in pg.event.get():
         if event.type == pg.QUIT:
             quit()
@@ -121,7 +122,7 @@ while True:
     # keep track of the number of platforms that will be put on the screen
     # this number will decrease as the player's score gets higher and eventually reach 0
     doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
-    extra_platform_num = int((30 - (best_doodler.score/20)**0.5)*doodler_change)
+    extra_platform_num = int((10 - (best_doodler.score/20)**0.1)*doodler_change)
 
     # add the extra platforms to the screen where possible
     tries = 0
@@ -177,7 +178,7 @@ while True:
             doodlers.remove(doodler)
     
     if len(doodlers) == 0:
-        pg.quit()
+        quit()
         break
 
     ################################################################################################################################################################

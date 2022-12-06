@@ -67,6 +67,8 @@ def eval_genomes(genomes, config):
     # for platform generation control
     prev_score = 0
 
+    best_doodler_score_keeper = 0
+
     ####################################################################################################
     # neat-AI setup
     ####################################################################################################
@@ -136,7 +138,7 @@ def eval_genomes(genomes, config):
             new_plat_type = "still"
             if random.random() < moving_chance:
                 new_plat_type = "moving"
-            platforms.append(Platform((random.random()*(WIDTH - plat_width), best_doodler.score + 30), new_plat_type))
+            platforms.append(Platform((random.random()*(WIDTH - plat_width), best_doodler.score - 30), new_plat_type))
             prev_score = int(best_doodler.score)
 
         # keep track of the number of platforms that will be put on the screen
@@ -220,15 +222,15 @@ def eval_genomes(genomes, config):
         ################################################################################################################################################################
         # wrap the doodlers' position around the screen
         ################################################################################################################################################################
-        # wrap the doodlers' position around the screen
-        for doodler in doodlers:
-            doodler.screen_wrap(WIDTH)
+        
+        # for doodler in doodlers:
+        #     doodler.screen_wrap(WIDTH)
 
-            for doodler in doodlers:
-                if doodler.pos[0] > WIDTH:
-                    doodler.pos = (-doodler.width, doodler.pos[1])
-                if doodler.pos[0] < -doodler.width:
-                    doodler.pos = (WIDTH, doodler.pos[1])
+        #     for doodler in doodlers:
+        #         if doodler.pos[0] > WIDTH:
+        #             doodler.pos = (-doodler.width, doodler.pos[1])
+        #         if doodler.pos[0] < -doodler.width:
+        #             doodler.pos = (WIDTH, doodler.pos[1])
 
         # make the player be affected by gravity
         for doodler in doodlers:
@@ -294,6 +296,9 @@ def eval_genomes(genomes, config):
         # update the screen
         pg.display.flip() 
 
+        # update score keeper as well
+        best_doodler_score_keeper = int(best_doodler.score)
+
         # reward the living doodlers
         for player_id, player in enumerate(doodlers):
             if player not in dead_doodlers:
@@ -351,9 +356,10 @@ def eval_genomes(genomes, config):
         # draw out the red lines
         pg.display.flip() 
 
-        # if this generation can survive 60 seconds,
-        # it probably doing-back-and-forth movement that don't actually increase the score
-        if time.time() - start_time >= 60:
+        # if the best doodler survive 30 seconds without actually increase the score
+        # it probably doing-back-and-forth movement
+        # kill the generation
+        if time.time() - start_time > 30 and best_doodler_score_keeper == int(best_doodler.score):
             pg.quit()
 
 def run(config_file):

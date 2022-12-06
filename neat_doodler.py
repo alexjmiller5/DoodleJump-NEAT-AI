@@ -2,9 +2,10 @@ import os
 import neat
 
 import pygame as pg
+import random
 
-from Doodler import *
-from plat import *
+from Doodler import Doodler
+from plat import Platform
 
 # fitness function for NEAT, will be called everytime a new generation starts
 def eval_genomes(genomes, config):
@@ -13,6 +14,7 @@ def eval_genomes(genomes, config):
     # game setup portion from main with modification:
     ####################################################################################################
     pg.init()
+    pg.display.init()
 
     WIDTH = 493 # Screen width constant
     HEIGHT = int(WIDTH*1.5) # Screen height constant
@@ -34,24 +36,26 @@ def eval_genomes(genomes, config):
     vertical_lines = [i for i in range(WIDTH) if i % 20 == 0]
     horizontal_lines = [i for i in range(HEIGHT) if i % 20 == 0]
 
-    # initialize objects
-    platforms = []
-    temp_plat = Platform((0,0))
+    # store platform dimension variables
+    temp_plat = Platform((0,0), "still")
     plat_width = temp_plat.width
     plat_height = temp_plat.height
 
+    # initialize object lists
+    platforms = []
+    dead_doodlers = []
+
     # generate initial platforms
-    while len(platforms) <= 30:
+    platforms.append(Platform((WIDTH/2, HEIGHT - 50), "still"))
+    while len(platforms) <= 10:
         new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
-        new_plat = Platform(new_plat_pos)
+        new_plat = Platform(new_plat_pos, "still")
         is_too_close = False
         for platform in platforms:
-            if new_plat.is_too_close_to(platform):
+            if new_plat.is_too_close_to(platform, WIDTH):
                 is_too_close = True
         if not is_too_close:
-            platforms.append(Platform(new_plat_pos))
-
-    dead_doodlers = []
+            platforms.append(new_plat)
 
     # Run until the user asks to quit
     running = True
@@ -95,6 +99,7 @@ def eval_genomes(genomes, config):
                 pg.quit()
                 quit()
                 break
+                
 
         # find the best and worst doodler
         # best doodler for the platform generation and spotlight
@@ -108,31 +113,54 @@ def eval_genomes(genomes, config):
                 worst_doodler = doodler
 
         ################################################################################################################################################################
+        # scroll screen back to the best doodler in case it's much lower than the previous best doodler
+        ################################################################################################################################################################
+
+        if best_doodler.score_line > 0.33*HEIGHT:
+            offset = best_doodler.score_line - 0.33*HEIGHT
+            best_doodler.score_line = 0.33*HEIGHT
+            for doodler in doodlers:
+                doodler.pos = (doodler.pos[0], doodler.pos[1] - offset)
+                doodler.score_line -= offset
+            for platform in platforms:
+                platform.pos = (platform.pos[0], platform.pos[1] - offset)
+
+       ################################################################################################################################################################
         # platform generation as the best doodler gets higher and higher
         ################################################################################################################################################################
 
+        # deteremine the chance a platform might be moving based on the doodler's score
+        moving_chance = (best_doodler.score**0.5)/100
+
         # create platforms that are always reachable by the doodler
-        if int(best_doodler.score) % 17 == 0 and int(best_doodler.score) != prev_score:
-            platforms.append(Platform((random.random()*(WIDTH - plat_width), -100)))
+        if int(best_doodler.score) % 240 == 0 and int(best_doodler.score) != prev_score:
+            new_plat_type = "still"
+            if random.random() < moving_chance:
+                new_plat_type = "moving"
+            platforms.append(Platform((random.random()*(WIDTH - plat_width), - HEIGHT - 100), new_plat_type))
             prev_score = int(best_doodler.score)
 
         # keep track of the number of platforms that will be put on the screen
         # this number will decrease as the player's score gets higher and eventually reach 0
         doodler_change = (worst_doodler.score_line + HEIGHT)/HEIGHT
-        extra_platform_num = int((30 - best_doodler.score**0.5)*doodler_change)
+        extra_platform_num = int((10 - (best_doodler.score/20)**0.1)*doodler_change)
 
+        # add the extra platforms to the screen where possible
         tries = 0
         while len(platforms) - 4 <= extra_platform_num:
             if tries > 10:
                 break
             new_plat_pos = (random.random()*(WIDTH - plat_width), -1*plat_height - 20 - random.random()*HEIGHT)
-            new_plat = Platform(new_plat_pos)
+            new_plat_type = "still"
+            if random.random() < 0.1:
+                new_plat_type = "moving"
+            new_plat = Platform(new_plat_pos, new_plat_type)
             is_too_close = False
             for platform in platforms:
-                if new_plat.is_too_close_to(platform):
+                if new_plat.is_too_close_to(platform, WIDTH):
                     is_too_close = True
             if not is_too_close:
-                platforms.append(Platform(new_plat_pos))
+                platforms.append(Platform(new_plat_pos, new_plat_type))
                 tries = 0
             tries += 1
         
@@ -145,48 +173,60 @@ def eval_genomes(genomes, config):
             for doodler in doodlers:
                 if doodler != best_doodler:
                     doodler.pos = (doodler.pos[0], doodler.pos[1] - offset*DT)
-                    doodler.score_line -= offset
-            best_doodler.score -= offset
+                    doodler.score_line -= offset*DT
+            best_doodler.score -= offset*DT
             best_doodler.pos = (best_doodler.pos[0], best_doodler.pos[1] - offset*DT)
             for platform in platforms:
                 platform.pos = (platform.pos[0], platform.pos[1] - offset*DT)
 
         ################################################################################################################################################################
-        # control doodler scores and loss condition
+        # control doodler scores
         ################################################################################################################################################################
 
         for doodler in doodlers:
             offset = doodler.vel[1]
-            if doodler.pos[1] < doodler.score_line and offset < 0:
-                doodler.score -= offset
-                doodler.score_line += offset
-        
-        for doodler in doodlers:
-            if doodler.pos[1] > doodler.score_line + 0.66*HEIGHT + doodler.height:
-                dead_doodlers.append(doodler)
-                doodler.dead = True
-                doodlers.remove(doodler)
+            if doodler.pos[1] < doodler.score_line and offset < 0 and doodler != best_doodler:
+                doodler.score -= offset*DT
+                doodler.score_line += offset*DT
 
+        ################################################################################################################################################################
+        # control doodler loss condition
+        ################################################################################################################################################################
+
+        for doodler in doodlers:
+            if doodler.is_dead(HEIGHT):
+                dead_doodlers.append(doodler)
+                doodlers.remove(doodler)
+        
         if len(doodlers) == 0:
             pg.quit()
             break
+        
+        ################################################################################################################################################################
+        # remove platforms that are below the doodler with the lowest score
+        ################################################################################################################################################################
+        
+        for platform in platforms:
+            if platform.pos[1] > worst_doodler.pos[1] + HEIGHT*0.66 + plat_height:
+                platforms.remove(platform)
 
         ################################################################################################################################################################
+        # control moving platform movement
+        ################################################################################################################################################################
+
+        for platform in platforms:
+            if platform.type == "moving":
+                platform.move(WIDTH)
+
+        ################################################################################################################################################################
+        # control doodler movement
+        ################################################################################################################################################################
+        
         # wrap the doodlers' position around the screen
-        ################################################################################################################################################################
-        
         for doodler in doodlers:
-            if doodler.pos[0] > WIDTH:
-                doodler.pos = (-doodler.width, doodler.pos[1])
-            if doodler.pos[0] < -doodler.width:
-                doodler.pos = (WIDTH, doodler.pos[1])
+            doodler.screen_wrap(WIDTH)
 
-        
-        ################################################################################################################################################################
-        # control movement
-        ################################################################################################################################################################
-        
-        # make the player be affected by gravity
+        # make the doodlers be affected by gravity
         for doodler in doodlers:
             doodler.apply_gravity(DT)
             doodler.collision = False
@@ -214,13 +254,7 @@ def eval_genomes(genomes, config):
 
         # move the player
         for doodler in doodlers:
-            if not doodler.collision:
-                doodler.move(DT)
-
-        pg.draw.line(screen, (0,0,0), (0,worst_doodler.pos[1] - HEIGHT*0.5 - plat_height), (WIDTH,worst_doodler.pos[1] - HEIGHT*0.5 - plat_height))
-        for platform in platforms:
-            if platform.pos[1] > worst_doodler.pos[1] + HEIGHT*0.66 + plat_height:
-                platforms.remove(platform)
+            doodler.move(DT)
 
         ################################################################################################################################################################
         # display everything
@@ -235,20 +269,21 @@ def eval_genomes(genomes, config):
         for x_pos in vertical_lines:
             pg.draw.line(screen, (233, 225, 214), (x_pos, 0), (x_pos, HEIGHT))
 
-        # display all objects
+        # display all platforms
         for platform in platforms:
             platform.display(screen)
         
+        # display all doodlers
         for doodler in doodlers:
             if doodler.pos[1] < HEIGHT + doodler.height:
                 doodler.display(screen)
 
-        # display the current score
+        # display the best doodler's score
         text = my_font.render(str(int(best_doodler.score)), False, (0, 0, 0))
         screen.blit(text, (0.1*WIDTH, 0.066*HEIGHT))
 
         # update the screen
-        pg.display.flip() 
+        pg.display.flip()
 
         # reward the living doodlers
         for player_id, player in enumerate(doodlers):

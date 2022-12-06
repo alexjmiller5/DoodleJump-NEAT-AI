@@ -118,7 +118,7 @@ while True:
         new_plat_type = "still"
         if random.random() < moving_chance:
             new_plat_type = "moving"
-        platforms.append(Platform((random.random()*(WIDTH - plat_width), -HEIGHT - 100), new_plat_type))
+        platforms.append(Platform((random.random()*(WIDTH - plat_width), best_doodler.score + 30), new_plat_type))
         prev_score = int(best_doodler.score)
 
     # keep track of the number of platforms that will be put on the screen

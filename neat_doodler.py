@@ -9,8 +9,6 @@ from plat import *
 # fitness function for NEAT, will be called everytime a new generation starts
 def eval_genomes(genomes, config):
 
-    print("eval_genomes called")
-
     ####################################################################################################
     # game setup portion from main with modification:
     ####################################################################################################

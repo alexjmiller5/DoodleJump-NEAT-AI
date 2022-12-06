@@ -246,14 +246,15 @@ def eval_genomes(genomes, config):
 
                     # update hitPlatforms
                     hitPlatforms[player_id] = platform_id
-                elif platform.collided_width(doodler):
+                
+                if platform.collided_width(doodler):
                     # reward player for hitting higher platform
                     if platform_id > hitPlatforms[player_id]:
-                        ge[player_id].fitness += 1
+                        ge[player_id].fitness += 0.1
                     
-                    # punish player for hitting lower platform
-                    if  platform_id < hitPlatforms[player_id]:
-                        ge[player_id].fitness -= 0.5
+                    # punish player for hitting lower or same platform
+                    if  platform_id <= hitPlatforms[player_id]:
+                        ge[player_id].fitness -= 0.05
 
                     hitPlatforms[player_id] = platform_id
 
@@ -290,7 +291,14 @@ def eval_genomes(genomes, config):
                 doodler.display(screen)
 
         # display the best doodler's score
-        text = my_font.render(str(int(best_doodler.score)), False, (0, 0, 0))
+       # text = my_font.render(str(int(best_doodler.score)), False, (0, 0, 0))
+
+        # display the best fitness
+        fit_list = []
+        for g in ge:
+            fit_list.append(g.fitness)
+        text = my_font.render(str(max(fit_list)), False, (0, 0, 0))
+
         screen.blit(text, (0.1*WIDTH, 0.066*HEIGHT))
 
         # update the screen
@@ -299,7 +307,7 @@ def eval_genomes(genomes, config):
         # reward the living doodlers
         for player_id, player in enumerate(doodlers):
             if player not in dead_doodlers:
-                ge[player_id].fitness += 1
+                ge[player_id].fitness += 0.1
 
         for player_id, player in enumerate(doodlers):
             # Variables for Input layer
@@ -340,14 +348,21 @@ def eval_genomes(genomes, config):
             pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_above)
             pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_below)
 
-            #feed the networks
-            output = networks[player_id].activate((cloest_platform_above_x, cloest_platform_above_y, 
-                                                    cloest_platform_below_x, cloest_platform_below_y,
-                                                    player_x, player_y, player.vel[1]))
+            # calculate the relative distance between doodler and those platforms
+            cloest_platform_above_dist_x = player_x - cloest_platform_above_x
+            cloest_platform_above_dist_y = player_y - cloest_platform_above_y
 
-            if output[0] > 0.5:
+            cloest_platform_below_dist_x = player_x - cloest_platform_below_x
+            cloest_platform_below_dist_y = cloest_platform_below_y - player_y
+
+            #feed the networks
+            output = networks[player_id].activate((cloest_platform_above_dist_x, cloest_platform_above_dist_y, 
+                                                    cloest_platform_below_dist_x, cloest_platform_below_dist_y,
+                                                    player.vel[1]))
+
+            if output[0] > 0:
                 player.update_movement(DT, True, False)
-            if output[1] > 0.5:
+            if output[1] > 0:
                 player.update_movement(DT, False, True)
 
         # draw out the red lines
@@ -365,6 +380,7 @@ def eval_genomes(genomes, config):
         # did plus 1 so the game doesn't quit right at launch
         if int(time.time() + 1 - start_time) % 10 == 0 and best_doodler_score_keeper == int(best_doodler.score):
             pg.quit()
+            break
 
 def run(config_file):
     # start the neat algorithm based on the congifuration file
@@ -383,7 +399,7 @@ def run(config_file):
     # eval_genomes is the fitness function which is called once per generation
     print("about to start")
 
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, 100)
 
 
 if __name__ == '__main__':

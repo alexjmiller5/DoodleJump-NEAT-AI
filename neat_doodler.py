@@ -265,8 +265,10 @@ def eval_genomes(genomes, config):
                 next_platform = platforms[hitPlatforms[player_id]+1]
             except:
                 print(player_id)
+                print(player == best_doodler)
                 print(hitPlatforms[player_id])
                 print(len(platforms))
+                quit()
 
             # calculate the distance between 
             next_platform_x, next_platform_y = next_platform.pos

@@ -45,6 +45,8 @@ platforms = []
 doodlers = [Doodler((WIDTH/2, 0.9*HEIGHT)) for i in range(GENERATION_SIZE)]
 dead_doodlers = []
 
+platforms.append(Platform((WIDTH/2, HEIGHT - 50), "still"))
+
 # generate initial platforms
 while len(platforms) <= 10:
     new_plat_pos = (random.random()*(WIDTH - plat_width), random.random()*(HEIGHT - 2*plat_height) - plat_height - 40)
@@ -112,7 +114,7 @@ while True:
     moving_chance = (best_doodler.score**0.5)/100
 
     # create platforms that are always reachable by the doodler
-    if int(best_doodler.score) % 260 == 0 and int(best_doodler.score) != prev_score:
+    if int(best_doodler.score) % 240 == 0 and int(best_doodler.score) != prev_score:
         new_plat_type = "still"
         if random.random() < moving_chance:
             new_plat_type = "moving"

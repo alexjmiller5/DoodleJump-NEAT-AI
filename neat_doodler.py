@@ -3,8 +3,10 @@ import neat
 
 import pygame as pg
 
-from Doodler import *
-from plat import *
+from Doodler import Doodler
+from plat import Platform, intersect
+import math
+import random
 
 import time # to kill the current generation if one generation stuck)
 
@@ -320,55 +322,124 @@ def eval_genomes(genomes, config):
         #         ge[player_id].fitness += 0.1
 
         for player_id, player in enumerate(doodlers):
-            # Variables for Input layer
+            # # Variables for Input layer
 
-            # calculate the distance between 
-            player_x, player_y = player.pos
 
-            cloest_platform_above_x = 0
-            cloest_platform_above_y = 0
-            cloest_platform_above_dist = float("inf")
+            ######################################################################################################################################################
+            # old greedy implementation
+            ######################################################################################################################################################
 
-            cloest_platform_below_x, cloest_platform_below_y = platforms[-1].pos
-            cloest_platform_below_dist = float("inf")
+            # # calculate the distance between 
+            # player_x, player_y = player.pos
+
+            # cloest_platform_above_x = 0
+            # cloest_platform_above_y = 0
+            # cloest_platform_above_dist = float("inf")
+
+            # cloest_platform_below_x, cloest_platform_below_y = platforms[-1].pos
+            # cloest_platform_below_dist = float("inf")
+
+            # for platform in platforms:
+            #     platform_x, platform_y = platform.pos
+
+            #     dist = (player_x - platform_x)**2 + (player_y - platform_y)**2
+
+            #     # platform is above and is closer than current cloest
+            #     if platform_y < player_y and dist < cloest_platform_above_dist:
+            #         # replace cloest_platform_above
+            #         cloest_platform_above_x = platform_x
+            #         cloest_platform_above_y = platform_y
+            #         cloest_platform_above_dist = dist
+                
+            #     # platform is below and is closer than current cloest
+            #     if platform_y > player_y and dist < cloest_platform_below_dist:
+            #         # replace cloest_platform_below
+            #         cloest_platform_below_x = platform_x
+            #         cloest_platform_below_y = platform_y
+            #         cloest_platform_below_dist = dist
+
+            # cloest_platform_above = (cloest_platform_above_x, cloest_platform_above_y)
+            # cloest_platform_below = (cloest_platform_below_x, cloest_platform_below_y)
+
+            # # display the input on-screen so we can see the learning process
+            # pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_above)
+            # pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_below)
+
+            # # calculate the relative distance between doodler and those platforms
+            # cloest_platform_above_dist_x = player_x - cloest_platform_above_x
+            # cloest_platform_above_dist_y = player_y - cloest_platform_above_y
+
+            # cloest_platform_below_dist_x = player_x - cloest_platform_below_x
+            # cloest_platform_below_dist_y = cloest_platform_below_y - player_y
+
+            # #feed the networks
+            # output = networks[player_id].activate((cloest_platform_above_dist_x, cloest_platform_above_dist_y, 
+            #                                         cloest_platform_below_dist_x, cloest_platform_below_dist_y,
+            #                                         player.vel[1]))
+
+            ######################################################################################################################################################
+            # new implementation with eight lines in all direcitons
+            ######################################################################################################################################################
+
+
+
+            possible_output_plats = [[], [], [], [], [], [], [], []]
+
+            player_line_points = []
+            for degrees in range(0, 360, 45):
+                radians = degrees*math.pi/180
+                new_line_point = (WIDTH*math.cos(radians) + player.pos[0], WIDTH*math.sin(radians) + player.pos[1])
+                player_line_points.append(new_line_point)
 
             for platform in platforms:
-                platform_x, platform_y = platform.pos
+                plat_lines = platform.get_rect()
+                for plat_line in plat_lines:
+                    for i in range(8):
+                        player_line_point = player_line_points[i]
+                        if intersect(plat_line[0], plat_line[1], player_line_point, player.pos):
+                            possible_output_plats[i].append(platform)
 
-                dist = (player_x - platform_x)**2 + (player_y - platform_y)**2
+            output_plats = [0]*8
 
-                # platform is above and is closer than current cloest
-                if platform_y < player_y and dist < cloest_platform_above_dist:
-                    # replace cloest_platform_above
-                    cloest_platform_above_x = platform_x
-                    cloest_platform_above_y = platform_y
-                    cloest_platform_above_dist = dist
-                
-                # platform is below and is closer than current cloest
-                if platform_y > player_y and dist < cloest_platform_below_dist:
-                    # replace cloest_platform_below
-                    cloest_platform_below_x = platform_x
-                    cloest_platform_below_y = platform_y
-                    cloest_platform_below_dist = dist
+            for i in range(8):
+                plats = possible_output_plats[i]
+                closest_plat = None
+                closest_plat_dist = float("inf")
+                for plat in plats:
+                    temp_dist = dist(player.pos, plat.pos)
+                    if temp_dist < closest_plat_dist:
+                        closest_plat = plat
+                        closest_plat_dist = temp_dist
+                output_plats[i] = closest_plat
+            
+            output_x_and_y_dists = []
 
-            cloest_platform_above = (cloest_platform_above_x, cloest_platform_above_y)
-            cloest_platform_below = (cloest_platform_below_x, cloest_platform_below_y)
+            for plat in output_plats:
+                if plat != None:
+                    pg.draw.line(screen, (255, 0, 0), player.pos, plat.pos)
+                    output_x_and_y_dists.append((plat.pos[0] - player.pos[0], plat.pos[1] - player.pos[1]))
+                else:
+                    output_x_and_y_dists.append((-100000000, -1000000000))
+            output = networks[player_id].activate((output_x_and_y_dists[0][0], 
+            output_x_and_y_dists[0][1], 
+            output_x_and_y_dists[1][0],
+            output_x_and_y_dists[1][1],
+            output_x_and_y_dists[2][0],
+            output_x_and_y_dists[2][1],
+            output_x_and_y_dists[3][0],
+            output_x_and_y_dists[3][1],
+            output_x_and_y_dists[4][0],
+            output_x_and_y_dists[4][1],
+            output_x_and_y_dists[5][0],
+            output_x_and_y_dists[5][1],
+            output_x_and_y_dists[6][0],
+            output_x_and_y_dists[6][1],
+            output_x_and_y_dists[7][0],
+            output_x_and_y_dists[7][1],
+            ))
 
-            # display the input on-screen so we can see the learning process
-            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_above)
-            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_below)
 
-            # calculate the relative distance between doodler and those platforms
-            cloest_platform_above_dist_x = player_x - cloest_platform_above_x
-            cloest_platform_above_dist_y = player_y - cloest_platform_above_y
 
-            cloest_platform_below_dist_x = player_x - cloest_platform_below_x
-            cloest_platform_below_dist_y = cloest_platform_below_y - player_y
-
-            #feed the networks
-            output = networks[player_id].activate((cloest_platform_above_dist_x, cloest_platform_above_dist_y, 
-                                                    cloest_platform_below_dist_x, cloest_platform_below_dist_y,
-                                                    player.vel[1]))
 
             if output[0] > 0.5:
                 player.update_movement(DT, True, False)
@@ -411,6 +482,8 @@ def run(config_file):
 
     winner = population.run(eval_genomes, 100)
 
+def dist(p1, p2):
+    return math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) )
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is

@@ -35,6 +35,14 @@ class Platform():
 
         surf.blit(self.img, self.pos)
 
+    def get_rect(self):
+        l1p1 = (self.pos[0], self.pos[1])
+        l1p2 = (self.pos[0], self.pos[1] + self.height)
+        l2p1 = (self.pos[0] + self.width, self.pos[1])
+        l2p2 = (self.pos[0] + self.width, self.pos[1] + self.height)
+
+        return ((l1p1, l2p1), (l2p2, l1p2), (l1p1, l1p2), (l2p1,l2p2))
+
     def collided_width(self, player):
         """detect collsions between the line of direction of 
         the input position tuples, using the intersection of the

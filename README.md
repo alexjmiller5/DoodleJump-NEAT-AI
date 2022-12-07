@@ -21,3 +21,5 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 - make it so that when the doodler changes the way it's facing it looks nicer
 - change is_view_of function to work preoperly
 - change line calcuations to be at the center of the platforms and doodlers
+- go through NEAT branch and make sure it matches master branch
+- make sure that doodlers aren't able to accelerate like crazy

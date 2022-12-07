@@ -22,16 +22,16 @@ class Platform():
         """displays the platform on the input pygame surface
         """
 
-        # display a box around the platform for testing purposes
-        l1p1 = (self.pos[0], self.pos[1])
-        l1p2 = (self.pos[0], self.pos[1] + self.height)
-        l2p1 = (self.pos[0] + self.width, self.pos[1])
-        l2p2 = (self.pos[0] + self.width, self.pos[1] + self.height)
+        # # display a box around the platform for testing purposes
+        # l1p1 = (self.pos[0], self.pos[1])
+        # l1p2 = (self.pos[0], self.pos[1] + self.height)
+        # l2p1 = (self.pos[0] + self.width, self.pos[1])
+        # l2p2 = (self.pos[0] + self.width, self.pos[1] + self.height)
         
-        pg.draw.line(surf, (0, 0, 0), l1p1, l2p1)
-        pg.draw.line(surf, (0, 0, 0), l2p2, l1p2)
-        pg.draw.line(surf, (0, 0, 0), l1p1, l1p2)
-        pg.draw.line(surf, (0, 0, 0), l2p1, l2p2)
+        # pg.draw.line(surf, (0, 0, 0), l1p1, l2p1)
+        # pg.draw.line(surf, (0, 0, 0), l2p2, l1p2)
+        # pg.draw.line(surf, (0, 0, 0), l1p1, l1p2)
+        # pg.draw.line(surf, (0, 0, 0), l2p1, l2p2)
 
         surf.blit(self.img, self.pos)
 
@@ -54,7 +54,6 @@ class Platform():
         p4 = ()
         p5 = ()
         p6 = ()
-        
 
         if player.facing_right:
             p3 = (player.prev_pos[0] + 0.1*player.width, player.prev_pos[1] + player.height)

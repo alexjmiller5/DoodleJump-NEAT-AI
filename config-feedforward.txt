@@ -1,7 +1,7 @@
 [NEAT]
 fitness_criterion     = max
 fitness_threshold     = 10000
-pop_size              = 50
+pop_size              = 25
 reset_on_extinction   = True
 
 [DefaultGenome]
@@ -60,8 +60,8 @@ response_replace_rate   = 0.0
 # connection weight options
 weight_init_mean        = 0.0
 weight_init_stdev       = 1.0
-weight_max_value        = 30
-weight_min_value        = -30
+weight_max_value        = 500
+weight_min_value        = -500
 weight_mutate_power     = 0.5
 weight_mutate_rate      = 0.8
 weight_replace_rate     = 0.1

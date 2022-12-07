@@ -265,7 +265,7 @@ def eval_genomes(genomes, config):
                     if platform.pos[1] < hitPlatforms[player_id].pos[1]:
 
                         print("rewarding player {}".format(player_id))
-                        print(ge[player_id].fitness, ge[player_id].fitness + 0.1)
+                        print(ge[player_id].fitness, ge[player_id].fitness + 1)
                         print()
                         ge[player_id].fitness += 1
 
@@ -276,7 +276,7 @@ def eval_genomes(genomes, config):
                         # punish player for hitting same platform
                         # need to punish those m**f hard so they LEARN!!
                         print("punishing player {} for hitting same platform".format(player_id))
-                        print(ge[player_id].fitness, ge[player_id].fitness - 0.05)
+                        print(ge[player_id].fitness, ge[player_id].fitness - 5)
                         print()
                         ge[player_id].fitness -= 5
 
@@ -382,14 +382,12 @@ def eval_genomes(genomes, config):
             for i in range(8):
                 plat = output_plats[i]
                 if plat != None:
-
-                    
                     if player == best_doodler:
                         lines_to_draw.append(((player.pos[0] + 0.5*player.height, player.pos[1] + 0.5*player.width), (plat.pos[0] + 0.5*plat.width, plat.pos[1] + 0.5*plat.height)))
                     output_x_and_y_dists.append((plat.pos[0] - player.pos[0], plat.pos[1] - player.pos[1]))
                 else:
                     radians = i*math.pi/4
-                    output_x_and_y_dists.append((1000000000, 1000000000))
+                    output_x_and_y_dists.append((0, 0))
                     # output_x_and_y_dists.append((-1000000000*math.cos(radians), -1000000000*math.sin(radians)))
 
             moving_up = player.vel[1] > 0

@@ -1,3 +1,9 @@
+# Project: DoodleJump-NEAT-AI
+# Authors: Alex Miller and Ruihang Liu
+# Email: alexjmil@bu.edu and hrl@bu.edu
+# File description (neat_doodler_5_inputs.py): 
+#    this file implemented input option 2 mentioned in the paper we attached to this project.
+
 import os
 import neat
 

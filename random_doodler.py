@@ -1,8 +1,8 @@
 # Project: DoodleJump-NEAT-AI
 # Authors: Alex Miller and Ruihang Liu
 # Email: alexjmil@bu.edu and hrl@bu.edu
-# File description (main.py): implements main
-# functionality of the DoodleJump game using pygame
+# File description (random_doodler.py): random moves to play doodle jump
+# This also serves as the skeleton code for the game NEAT-AI will play.
 
 import pygame as pg
 from Doodler import Doodler
@@ -38,7 +38,7 @@ plat_width = temp_plat.width
 plat_height = temp_plat.height
 
 # NEAT variables
-GENERATION_SIZE = 20
+GENERATION_SIZE = 50
 
 # initialize object lists
 platforms = []

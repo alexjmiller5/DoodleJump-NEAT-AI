@@ -25,7 +25,7 @@ class Doodler:
         self.lost = False
         self.score_line = 0
         self.collision = False
-        self.dead = False
+        self.start_movement = False
 
     def display(self, surf):
         if self.facing_right:
@@ -40,12 +40,37 @@ class Doodler:
         self.prev_pos = (self.pos[0], platform.pos[1] - self.height)
 
     def move(self, dt):
-        self.prev_pos = self.pos
-        self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
-        self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
+        if not self.collision:
+            self.prev_pos = self.pos
+            self.pos = (self.pos[0] + self.vel[0]*dt, self.pos[1] + self.vel[1]*dt)
+            self.vel = (self.vel[0] + self.acc[0]*dt, self.vel[1] + self.acc[1]*dt)
 
     def apply_gravity(self, dt):
         self.acc = (self.acc[0], self.acc[1] + self.gravity*dt*(self.score**0.1))
+
+    def update_movement(self, dt, left, right):
+        if left:
+            if self.start_movement:
+                self.vel = (-.001*dt, self.vel[1])
+                self.acc = (0, self.acc[1])
+            self.move_left(dt)
+            self.start_movement = False
+        elif right:
+            if self.start_movement:
+                self.vel = (.001*dt, self.vel[1])
+                self.acc = (0, self.acc[1])
+            self.move_right(dt)
+            self.start_movement = False
+        elif self.vel[0] > 0.0005*dt:
+            self.acc = (-0.0001*dt, self.acc[1])
+            self.start_movement = True
+        elif self.vel[0] < -0.0005*dt:
+            self.acc = (0.0001*dt, self.acc[1])
+            self.start_movement = True
+        else:
+            self.vel = (0, self.vel[1])
+            self.acc = (0, self.acc[1])
+            self.start_movement = True
 
     def move_right(self, dt):
         self.facing_right = True
@@ -59,9 +84,21 @@ class Doodler:
         if self.vel[0] < -0.02*dt:
             self.vel = (-0.02*dt, self.vel[1])
 
-    def ai_move(self, dt):
+    def ai_random_move(self, dt):
         chance = random.random()
+        left = False
+        right = False
         if chance < 0.33:
-            self.move_right(dt)
+            left = True
         elif chance < 0.66:
-            self.move_left(dt)
+            right = True
+        self.update_movement(dt, left, right)
+
+    def is_dead(self, screen_height):
+        return self.pos[1] > self.score_line + 0.66*screen_height + self.height
+
+    def screen_wrap(self, screen_width):
+        if self.pos[0] > screen_width:
+            self.pos = (-self.width, self.pos[1])
+        if self.pos[0] < -self.width:
+            self.pos = (screen_width, self.pos[1])

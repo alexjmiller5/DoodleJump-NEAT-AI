@@ -18,7 +18,7 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 
 # TODO:
 
-[x] Make sure that the doodler always has a platform that is reachable
+[-] Make sure that the doodler always has a platform that is reachable
 [x] make the gravity and bounce scale correctly so that the game gets more difficult
 [x] make sure that the doodler's sideswitching doesn't affect the collision detection
 [x] make the doodler be able to switch sides of the screen from the edge

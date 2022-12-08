@@ -7,7 +7,7 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
     - NOTE: Be aware of "pip install neat". "neat" module is different from the neat-python module. Thus, to install neat-python, please use "pip install neat-python".
 
 # 3 important files we want you to know before you run
-1. random_doodler.py: this file contains 50 randomly-controlled doodler. This is not part of the NEAT algorithm we implemented. However, it is a good control group to see if the NEAT algorithm improves its ability to play Doodle Jump.
+1. random_doodler.py: this file contains 50 randomly-controlled doodler. This is not part of the NEAT algorithm. However, it is a good control group to see if the NEAT algorithm improves its ability to play Doodle Jump.
 2. neat_doodler_5_inputs.py: this file implemented input option 2 mentioned in the paper we attached to this project.
 3. neat_doodler_17_inputs.py: this file implemetned input option 3 mentioned in our paper.
 

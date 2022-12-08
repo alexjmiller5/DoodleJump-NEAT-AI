@@ -16,6 +16,11 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 2. Run the corresponding python file.
 3. Watch as the neural network learns to beat DoodleJump
 
+# Some YouTube Videos for the traning:
+For 5-input: https://youtu.be/TbiUGNLxEMQ
+For 17-input: https://youtu.be/CsDxCkCBqnc
+
+
 # TODO:
 
 - [x] Make sure that the doodler always has a platform that is reachable

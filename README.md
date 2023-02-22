@@ -20,6 +20,8 @@ This project implements the NEAT (Neuroevolution of Augmenting Topologies) algor
 For 5-input: https://youtu.be/TbiUGNLxEMQ
 For 17-input: https://youtu.be/CsDxCkCBqnc
 
+# Paper that goes with this project
+[DoodleJump-NEAT-AI And A Comparative Analysis on the Importance of Inputs and Reward System](https://docs.google.com/document/d/1TV9vBYJhPeZkpovewtvGCP9XhaJxFoFu_eLgzjcz0Vw/edit?usp=sharing)
 
 # TODO:
 

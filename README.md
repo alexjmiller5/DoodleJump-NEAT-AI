@@ -23,6 +23,9 @@ For 17-input: https://youtu.be/CsDxCkCBqnc
 # Paper that goes with this project
 [DoodleJump-NEAT-AI And A Comparative Analysis on the Importance of Inputs and Reward System](https://docs.google.com/document/d/1TV9vBYJhPeZkpovewtvGCP9XhaJxFoFu_eLgzjcz0Vw/edit?usp=sharing)
 
+# Original NEAT paper:
+[Efficient Evolution of Neural Network Topologies](https://nn.cs.utexas.edu/downloads/papers/stanley.cec02.pdf)
+
 # TODO:
 
 - [x] Make sure that the doodler always has a platform that is reachable

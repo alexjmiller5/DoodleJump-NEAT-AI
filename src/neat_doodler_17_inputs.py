@@ -2,7 +2,7 @@
 # Authors: Alex Miller and Ruihang Liu
 # Email: alexjmil@bu.edu and hrl@bu.edu
 # File description (neat_doodler_5_inputs.py): 
-#    this file implemented input option 2 mentioned in the paper we attached to this project.
+#    this file implemented input option 3 mentioned in the paper we attached to this project.
 
 import os
 import neat
@@ -11,6 +11,8 @@ import pygame as pg
 
 from Doodler import *
 from plat import *
+
+import math
 
 import time # to kill the current generation if one generation stuck)
 
@@ -24,9 +26,9 @@ class generation_counter():
 # fitness function for NEAT, will be called everytime a new generation starts
 def eval_genomes(genomes, config):
 
-    start_time = time.time()
-
     gen_counter.increment()
+
+    start_time = time.time()
 
     ####################################################################################################
     # game setup portion from main with modification:
@@ -241,6 +243,7 @@ def eval_genomes(genomes, config):
         # wrap the doodlers' position around the screen
         ################################################################################################################################################################
         
+        # don't wrap the doodler to make learning faster
         # for doodler in doodlers:
         #     doodler.screen_wrap(WIDTH)
 
@@ -268,7 +271,7 @@ def eval_genomes(genomes, config):
                     if platform.pos[1] < hitPlatforms[player_id].pos[1]:
 
                         # print("rewarding player {}".format(player_id))
-                        # print(ge[player_id].fitness, ge[player_id].fitness + 0.1)
+                        # print(ge[player_id].fitness, ge[player_id].fitness + 1)
                         # print()
                         ge[player_id].fitness += 1
 
@@ -279,7 +282,7 @@ def eval_genomes(genomes, config):
                         # punish player for hitting same platform
                         # need to punish those m**f hard so they LEARN!!
                         # print("punishing player {} for hitting same platform".format(player_id))
-                        # print(ge[player_id].fitness, ge[player_id].fitness - 0.05)
+                        # print(ge[player_id].fitness, ge[player_id].fitness - 5)
                         # print()
                         ge[player_id].fitness -= 5
 
@@ -315,6 +318,7 @@ def eval_genomes(genomes, config):
             if doodler.pos[1] < HEIGHT + doodler.height:
                 doodler.display(screen)
 
+
         # display the best fitness
         fit_list = []
         for g in ge:
@@ -338,61 +342,90 @@ def eval_genomes(genomes, config):
         #     if player not in dead_doodlers:
         #         ge[player_id].fitness += 0.1
 
+        lines_to_draw = []
+
         for player_id, player in enumerate(doodlers):
             # Variables for Input layer
 
-            # calculate the distance between 
-            player_x, player_y = player.pos
+            possible_output_plats = [[], [], [], [], [], [], [], []]
 
-            cloest_platform_above_x = 0
-            cloest_platform_above_y = 0
-            cloest_platform_above_dist = float("inf")
-
-            cloest_platform_below_x, cloest_platform_below_y = platforms[-1].pos
-            cloest_platform_below_dist = float("inf")
+            player_lines = []
+            for degrees in range(0, 360, 45):
+                radians = degrees*math.pi/180
+                new_line_p1 = (HEIGHT*math.cos(radians) + player.pos[0], HEIGHT*math.sin(radians) + player.pos[1])
+                new_line_p2 = (player.pos[0] + 0.5*player.width*(1 + math.cos(radians)), player.pos[1] + 0.5*player.height*(1 + math.sin(radians)))
+                new_line = (new_line_p1, new_line_p2)
+                player_lines.append(new_line)
 
             for platform in platforms:
-                platform_x, platform_y = platform.pos
+                plat_lines = platform.get_rect()
+                for plat_line in plat_lines:
+                    for i in range(8):
+                        player_line = player_lines[i]
+                        
+                        # draw lines for testing
+                        # if player == best_doodler:
+                            # pg.draw.line(screen, (255, 0, 0), plat_line[0], plat_line[1])
+                            # pg.draw.line(screen, (255, 0, 0), player_line[0], player_line[1])
+                        if intersect(plat_line[0], plat_line[1], player_line[0], player_line[1]):
+                            possible_output_plats[i].append(platform)
 
-                dist = (player_x - platform_x)**2 + (player_y - platform_y)**2
+            output_plats = [0]*8
 
-                # platform is above and is closer than current cloest
-                if platform_y < player_y and dist < cloest_platform_above_dist:
-                    # replace cloest_platform_above
-                    cloest_platform_above_x = platform_x
-                    cloest_platform_above_y = platform_y
-                    cloest_platform_above_dist = dist
-                
-                # platform is below and is closer than current cloest
-                if platform_y > player_y and dist < cloest_platform_below_dist:
-                    # replace cloest_platform_below
-                    cloest_platform_below_x = platform_x
-                    cloest_platform_below_y = platform_y
-                    cloest_platform_below_dist = dist
+            for i in range(8):
+                plats = possible_output_plats[i]
+                closest_plat = None
+                closest_plat_dist = float("inf")
+                for plat in plats:
+                    temp_dist = dist(player.pos, plat.pos)
+                    if temp_dist < closest_plat_dist:
+                        closest_plat = plat
+                        closest_plat_dist = temp_dist
+                output_plats[i] = closest_plat
+            
+            output_x_and_y_dists = []
 
-            cloest_platform_above = (cloest_platform_above_x, cloest_platform_above_y)
-            cloest_platform_below = (cloest_platform_below_x, cloest_platform_below_y)
+            for i in range(8):
+                plat = output_plats[i]
+                if plat != None:
+                    if player == best_doodler:
+                        lines_to_draw.append(((player.pos[0] + 0.5*player.height, player.pos[1] + 0.5*player.width), (plat.pos[0] + 0.5*plat.width, plat.pos[1] + 0.5*plat.height)))
+                    output_x_and_y_dists.append((plat.pos[0] - player.pos[0], plat.pos[1] - player.pos[1]))
+                else:
+                    radians = i*math.pi/4
+                    output_x_and_y_dists.append((0, 0))
+                    # output_x_and_y_dists.append((-1000000000*math.cos(radians), -1000000000*math.sin(radians)))
 
-            # display the input on-screen so we can see the learning process
-            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_above)
-            pg.draw.line(screen, (255, 0, 0), player.pos, cloest_platform_below)
+            moving_up = player.vel[1] > 0
 
-            # calculate the relative distance between doodler and those platforms
-            cloest_platform_above_dist_x = player_x - cloest_platform_above_x
-            cloest_platform_above_dist_y = player_y - cloest_platform_above_y
-
-            cloest_platform_below_dist_x = player_x - cloest_platform_below_x
-            cloest_platform_below_dist_y = cloest_platform_below_y - player_y
-
-            #feed the networks
-            output = networks[player_id].activate((cloest_platform_above_dist_x, cloest_platform_above_dist_y, 
-                                                    cloest_platform_below_dist_x, cloest_platform_below_dist_y,
-                                                    player.vel[1]))
+            output = networks[player_id].activate((
+            output_x_and_y_dists[0][0], 
+            output_x_and_y_dists[0][1], 
+            output_x_and_y_dists[1][0],
+            output_x_and_y_dists[1][1],
+            output_x_and_y_dists[2][0],
+            output_x_and_y_dists[2][1],
+            output_x_and_y_dists[3][0],
+            output_x_and_y_dists[3][1],
+            output_x_and_y_dists[4][0],
+            output_x_and_y_dists[4][1],
+            output_x_and_y_dists[5][0],
+            output_x_and_y_dists[5][1],
+            output_x_and_y_dists[6][0],
+            output_x_and_y_dists[6][1],
+            output_x_and_y_dists[7][0],
+            output_x_and_y_dists[7][1],
+            moving_up
+            ))
 
             if output[0] > 0.5:
                 player.update_movement(DT, True, False)
             if output[1] > 0.5:
                 player.update_movement(DT, False, True)
+
+        # draw the red lines (the doodler's line of sight to the platforms) for the best doodler
+        for line in lines_to_draw:
+            pg.draw.line(screen, (255, 0, 0), line[0], line[1])
 
         # draw out the red lines
         pg.display.flip() 
@@ -430,13 +463,15 @@ def run(config_file):
 
     winner = population.run(eval_genomes, 100)
 
+def dist(p1, p2):
+    return math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) )
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-5.txt')
+    config_path = os.path.join(local_dir, '../config/config-17.txt')
 
     gen_counter = generation_counter()
 

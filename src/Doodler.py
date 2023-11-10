@@ -9,9 +9,9 @@ from pygame.locals import RLEACCEL
 
 class Doodler:
     def __init__(self, starting_pos):
-        self.left_img = pg.image.load("leftdoodler.png").convert()
+        self.left_img = pg.image.load("../assets/images/leftdoodler.png").convert()
         self.left_img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
-        self.right_img = pg.image.load("rightdoodler.png").convert()
+        self.right_img = pg.image.load("../assets/images/rightdoodler.png").convert()
         self.right_img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
         self.height = self.left_img.get_height()
         self.width = self.left_img.get_width()

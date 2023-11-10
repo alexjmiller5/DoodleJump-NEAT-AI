@@ -11,7 +11,7 @@ import random
 class Platform():
     def __init__(self, pos, type):
         self.pos = pos
-        self.img = pg.image.load(type + " platform.png").convert()
+        self.img = pg.image.load("../assets/images/" + type + " platform.png").convert()
         self.img.set_colorkey((255, 255, 255), RLEACCEL) # get rid of the background
         self.height = self.img.get_height()
         self.width = self.img.get_width()

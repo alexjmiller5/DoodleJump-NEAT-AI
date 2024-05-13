@@ -1,24 +1,22 @@
 # DoodleJump-NEAT-AI
-This project implements the NEAT (Neuroevolution of Augmenting Topologies) algorithm in the game DoodleJump.
 
-# Dependencies
-- pygame
-- NEAT-Python
-    - NOTE: Be aware of "pip install neat". "neat" module is different from the neat-python module. Thus, to install neat-python, please use "pip install neat-python".
+This repo is an AI which utilizes NEAT (Neuroevolution of Augmenting Topologies) algorithm to train and play the popular game DoodleJump.
 
-# 3 important files we want you to know before you run
-1. random_doodler.py: this file contains 50 randomly-controlled doodler. This is not part of the NEAT algorithm. However, it is a good control group to see if the NEAT algorithm improves its ability to play Doodle Jump.
-2. neat_doodler_5_inputs.py: this file implemented input option 2 mentioned in the paper we attached to this project.
-3. neat_doodler_17_inputs.py: this file implemetned input option 3 mentioned in our paper.
+In this repo, we built the Doodler Game from the ground up using Pygame. In addition, we also documented the process of training the AI with 3 different versions of inputs for the doodler AI.
+
 
 # How to run this project
-1. Download all dependencies
-2. Run the corresponding python file.
+1. Download dependencies: ```pip install pygame neat-python```
+3. Run the corresponding python file to see the training yourself. There are 3 options in this repo:
+    1. `random_doodler.py`: This version contains 50 randomly-controlled doodler. It serves as a good control envrionment to see if the NEAT algorithm improves its ability to play Doodle Jump.
+    2. `neat_doodler_5_inputs.py`: This version trains the doodler with 5 inputs: doodler's velocity in y direction, x-distances and y-distances between the doodler and the closest platform above and the distances between it and the closest platform below. This is the option 2 descripted in the paper that goes alone with this repo.
+    3. `neat_doodler_17_inputs.py`: This version trains the doodler with 17 inputs: x-distances and y-distances between the doodler and the closest platform from 8 different directions (up, down, left, right, and 4 diagonal directions) and whether the doodler is moving up or down (the y-velocity of the doodler). This corresponds to option 3 in the paper.
 3. Watch as the neural network learns to beat DoodleJump
 
-# Some YouTube Videos for the traning:
-For 5-input: https://youtu.be/TbiUGNLxEMQ
-For 17-input: https://youtu.be/CsDxCkCBqnc
+# Some YouTube Demos for the traning:
+If you are too lazy to run the code above, here's some pretrained video for our demo purposes:
+* For 5-input: https://youtu.be/TbiUGNLxEMQ
+* For 17-input: https://youtu.be/CsDxCkCBqnc
 
 # Paper that goes with this project
 [DoodleJump-NEAT-AI And A Comparative Analysis on the Importance of Inputs and Reward System](https://docs.google.com/document/d/1TV9vBYJhPeZkpovewtvGCP9XhaJxFoFu_eLgzjcz0Vw/edit?usp=sharing)

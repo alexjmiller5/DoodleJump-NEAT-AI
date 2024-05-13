@@ -15,8 +15,12 @@ In this repo, we built the Doodler Game from the ground up using Pygame. In addi
 
 # Some YouTube Demos for the traning:
 If you are too lazy to run the code above, here's some pretrained video for our demo purposes:
-* For 5-input: https://youtu.be/TbiUGNLxEMQ
-* For 17-input: https://youtu.be/CsDxCkCBqnc
+* For 5-input: watch full training on YouTube [here](https://youtu.be/TbiUGNLxEMQ)
+![310bc35ff2f8433bb27273c9ebcc2c59](https://github.com/alexjmiller5/DoodleJump-NEAT-AI/assets/90875886/2b854eb6-042a-41f1-934c-529ec22ca745)
+
+
+* For 17-input: watch full training on YouTube [here](https://youtu.be/CsDxCkCBqnc)
+![a26196960e844543a5c9b4a6cc6abd84](https://github.com/alexjmiller5/DoodleJump-NEAT-AI/assets/90875886/4d174ecc-8b6d-47ce-b5de-a4db50ae151e)
 
 # Paper that goes with this project
 [DoodleJump-NEAT-AI And A Comparative Analysis on the Importance of Inputs and Reward System](https://docs.google.com/document/d/1TV9vBYJhPeZkpovewtvGCP9XhaJxFoFu_eLgzjcz0Vw/edit?usp=sharing)
